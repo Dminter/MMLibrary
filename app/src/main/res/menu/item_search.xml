@@ -1,0 +1,32 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:orderInCategory="100"
+        android:title="搜索"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_edit"
+        android:orderInCategory="100"
+        android:title="编辑库"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_csv"
+        android:orderInCategory="100"
+        android:title="导出CSV"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_share_tmp"
+        android:orderInCategory="100"
+        android:title="分享库结构"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_email"
+        android:orderInCategory="100"
+        android:title="发布库"
+        app:showAsAction="never" />
+
+</menu>

@@ -1,0 +1,64 @@
+apply plugin: 'com.android.application'
+
+
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '25.0.0'
+
+    defaultConfig {
+        applicationId "com.zncm.library"
+        minSdkVersion 15
+        targetSdkVersion 21
+        versionCode 12
+        versionName "0.1.2"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    signingConfigs {
+
+    }
+
+}
+
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.rengwuxian.materialedittext:library:1.8.3'
+    compile files('libs/ormlite-android-4.48.jar')
+    compile files('libs/ormlite-core-4.48.jar')
+    compile 'com.melnykov:floatingactionbutton:1.0.4'
+    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    compile 'com.malinskiy:materialicons:1.0.1'
+    compile 'com.github.flavienlaurent.datetimepicker:library:0.0.2'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:+'
+    compile 'de.greenrobot:eventbus:2.2.1'
+    compile 'com.github.xiprox.errorview:library:1.0.0'
+    compile 'com.github.lawloretienne:imagegallery:0.0.8'
+    compile 'com.commit451:PhotoView:1.2.4'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'com.miguelcatalan:materialsearchview:1.3.0'
+    compile 'cn.aigestudio.downloader:Downloader:1.3.7'
+    compile 'com.mani:ThinDownloadManager:1.1.0'
+    compile 'com.umeng.analytics:analytics:latest.integration'
+    compile 'com.jpardogo.materialtabstrip:library:1.0.0'
+    compile 'me.gujun.android.taggroup:library:1.4@aar'
+    compile 'com.fabiendevos:nanotasks:1.1.0'
+    compile 'com.mcxiaoke.volley:library:1.0.17'
+    compile 'com.jude:swipebackhelper:2.1.5'
+    compile 'com.github.kenumir:MaterialSettings:v.1.2.2'
+    compile files('libs/javacsv.jar')
+    compile files('libs/umeng-onlineconfig_v1.0.0.jar')
+    compile files('libs/jsoup-1.6.1.jar')
+    compile files('libs/fastjson-1.2.7.jar')
+}

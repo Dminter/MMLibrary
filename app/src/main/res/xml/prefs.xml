@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory>
+        <Preference
+            android:key="pfNull"
+            android:title=" " />
+
+        <Preference
+            android:key="pfCsv"
+            android:summary="仅支持UTF-8编码"
+            android:title="导入CSV" />
+        <Preference
+            android:key="pfDb"
+            android:summary="备份所有数据到存储卡"
+            android:title="备份" />
+
+        <Preference
+            android:key="pfShare"
+            android:title="导入网络库" />
+        <Preference
+            android:key="pfApiPage"
+            android:title="单次下载页数" />
+        <Preference
+            android:key="pfClipboardListen"
+            android:summary="监听"
+            android:title="监听剪切板" />
+
+        <Preference
+            android:key="pfShareApp"
+            android:title="分享给朋友" />
+
+        <Preference
+            android:key="pfUpdate"
+            android:title="新版本~" />
+
+        <Preference
+            android:key="pfQQ"
+            android:summary="提供库、交流、意见反馈"
+            android:title="加入QQ群" />
+        <Preference
+            android:key="pfAbout"
+            android:title="关于" />
+
+        <Preference
+            android:key="pfHelp"
+            android:title="帮助" />
+    </PreferenceCategory>
+    <PreferenceCategory>
+        <Preference
+            android:key="pfNotifyListen"
+            android:summary="监听"
+            android:title="监听通知栏" />
+
+        <Preference
+            android:key="pfNotifyKey"
+            android:title="关键字提醒" />
+
+
+        <Preference
+            android:key="pfNotifyListenInto"
+            android:summary="打开"
+            android:title="打开含有关键字的通知" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

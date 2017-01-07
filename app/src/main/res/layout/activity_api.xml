@@ -1,0 +1,90 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:orientation="vertical"
+            android:paddingBottom="70dp">
+
+            <Button
+                android:id="@+id/btnWx"
+                style="@style/mButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="微信精选-点击下载" />
+
+            <Button
+                android:id="@+id/btnNews"
+                style="@style/mButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="新闻聚合-点击下载" />
+
+            <Button
+                android:id="@+id/btnMv"
+                style="@style/mButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="美女图片-点击下载" />
+
+            <Button
+                android:id="@+id/btnXh"
+                style="@style/mButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="笑话文本-点击下载" />
+
+            <Button
+                android:id="@+id/btnXhpic"
+                style="@style/mButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="笑话图片-点击下载" />
+
+            <Button
+                android:id="@+id/btnBaidubk"
+                style="@style/mButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="百度百科" />
+
+            <Button
+                android:id="@+id/btnSys"
+                style="@style/mRedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="系统库" />
+
+
+            <Button
+                android:id="@+id/btnNet"
+                style="@style/mRedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="网页工具" />
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>

@@ -1,0 +1,55 @@
+.fs17 {font-size:17px !important;}
+div.g_line_c {
+	border:1px solid #bcccd2;
+	background:url(g_line.png) repeat-x top #dfe7ea;
+	padding:10px 10px 10px 10px;
+	height:1%;
+}
+table.k2 {width:100%;}
+table.k2 td {width:50%; vertical-align:top;}
+body, table {
+	font-family: Tahoma, Arial, "Trebuchet MS",  Verdana, Geneva, Helvetica, sans-serif;
+	font-size: 11px;
+	color: black;
+}
+h1 {
+	font-size:17px;
+	margin:0;
+	font-weight:normal;
+	padding-left:15px;
+}
+h2 {
+	font-size:14px;
+	margin:0;
+	font-weight:bold;
+	padding-left:15px;
+}
+div.border_box {
+	border:#e9e9e9 solid;
+	border-width:0px 1px 0 1px;
+}
+table.t1 {
+	width:100%;
+	border-bottom:1px #e9e9e9 solid;
+	border-top:1px #fff solid;
+	margin-top:1px;
+}
+
+table.role {
+	border:1px solid #bcccd2;
+	margin-top:1px;
+}
+
+table.role td {border:1px solid #bcccd2;}
+table.role tr {border:1px solid #bcccd2;}
+
+table.t1 td {padding:6px 10px 6px 10px; font-size:15px; vertical-align:top;}
+table.t1 th {padding:6px 10px 6px 10px; font-size:15px; text-align:left;}
+.g1_1 {background:#eaeaea;}
+.g1_2 {background:#f6f6f6;}
+.g2_1 {background:#f2f2f2;}
+.g2_2 {background:#f6f6f6;}
+.tite1 {
+	color: #000;
+	font-size: 14px;
+}
