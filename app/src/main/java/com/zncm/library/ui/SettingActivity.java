@@ -285,6 +285,18 @@ public class SettingActivity extends MaterialSettings {
             }
         }).setDefaultValue(MySp.get(SpConstant.isListenNotifyInto, Boolean.class, true)));
 
+
+        addItem(new HeaderItem(this).setTitle("其他"));
+        addItem(new TextItem(ctx, "").setTitle("本软件已开源").setSubtitle(Constant.GITHUB_URL).setOnclick(new TextItem.OnClickListener() {
+            @Override
+            public void onClick(TextItem textItem) {
+                Intent intent = new Intent(ctx, WebViewActivity.class);
+                intent.putExtra("url", Constant.GITHUB_URL);
+                startActivity(intent);
+            }
+        }));
+
+
     }
 
 

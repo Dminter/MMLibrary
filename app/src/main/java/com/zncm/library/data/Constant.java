@@ -49,6 +49,7 @@ public class Constant {
 
 
     public static String NET_BAIDU = "https://www.baidu.com/s?wd=";
+    public static String GITHUB_URL = "https://github.com/Dminter/MMLibrary";
 
 
     public static String SYS_WXHOT = "微信热门精选";
