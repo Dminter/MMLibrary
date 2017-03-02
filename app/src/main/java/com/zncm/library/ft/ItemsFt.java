@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,8 +29,16 @@ import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.asm.Type;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.malinskiy.materialicons.Iconify;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nanotasks.BackgroundWork;
@@ -34,20 +46,27 @@ import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.utils.L;
+import com.rengwuxian.materialedittext.MaterialEditText;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.data.ApiData.Feed;
 import com.zncm.library.data.Constant;
+import com.zncm.library.data.DetailInfo;
 import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Fields;
 import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
 import com.zncm.library.data.Options;
+import com.zncm.library.data.RefreshEvent;
+import com.zncm.library.data.SpConstant;
 import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
 import com.zncm.library.ui.LibAc;
 import com.zncm.library.ui.LibAddAc;
+import com.zncm.library.ui.LikeActivity;
 import com.zncm.library.ui.LocLibAc;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
@@ -56,6 +75,10 @@ import com.zncm.library.utils.ApiUrils;
 import com.zncm.library.utils.CSVUtils;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.DoubleClickImp;
+import com.zncm.library.utils.ImageUtil;
+import com.zncm.library.utils.MyPath;
+import com.zncm.library.utils.MySp;
+import com.zncm.library.utils.MyStringRequest;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.saxrssreader.RssFeed;
 import com.zncm.library.utils.saxrssreader.RssItem;
@@ -66,16 +89,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 
+import de.greenrobot.event.EventBus;
 import tr.xip.errorview.RetryListener;
 
 
@@ -121,13 +148,27 @@ public class ItemsFt extends BaseListFt {
             @Override
             public void setData(final int position, final MyViewHolder holder) {
                 final Items data = datas.get(position);
+                if (data == null) {
+                    return;
+                }
                 String title = null;
                 String content = null;
                 String picUrl = null;
 
 
+                if (data.isItem_exb1()) {
+                    holder.rlBg.setBackgroundResource(R.drawable.card_dark);
+                } else {
+                    holder.rlBg.setBackgroundResource(R.drawable.card);
+                }
+
                 if (XUtil.notEmptyOrNull(data.getItem_json())) {
-                    Map<String, Object> map = JSON.parseObject(data.getItem_json());
+                    Map<String, Object> map = new HashMap<>();
+                    try {
+                        map = JSON.parseObject(data.getItem_json());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     int j = 0;
                     for (int i = 0; i < fieldsList.size(); i++) {
                         Fields tmp = fieldsList.get(i);
@@ -225,12 +266,13 @@ public class ItemsFt extends BaseListFt {
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                                 int curPosition = position - listView.getHeaderViewsCount();
+
+
                                                 if (XUtil.notEmptyOrNull(query)) {
                                                     Items data = datas.get(curPosition);
                                                     if (data == null) {
                                                         return;
                                                     }
-
 
                                                     Intent intent = new Intent(ctx, ItemsDetailsAc.class);
                                                     intent.putExtra(Constant.KEY_PARAM_DATA, lib);
@@ -240,11 +282,37 @@ public class ItemsFt extends BaseListFt {
                                                     startActivity(intent);
 
                                                 } else {
-                                                    Intent intent = new Intent(ctx, ItemsDetailsAc.class);
-                                                    intent.putExtra(Constant.KEY_PARAM_DATA, lib);
-                                                    intent.putExtra("size", datas.size());
-                                                    intent.putExtra(Constant.KEY_CURRENT_POSITION, curPosition);
-                                                    startActivity(intent);
+                                                    XUtil.debug("data::" + datas.get(curPosition));
+                                                    Items tmp = datas.get(curPosition);
+                                                    boolean flag = false;
+                                                    if (MySp.get(SpConstant.isOpenUrl, Boolean.class, false)) {
+                                                        if (lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value()
+                                                                || lib.getLib_exi1() == Lib.libType.api.value()) {
+                                                            if (XUtil.notEmptyOrNull(tmp.getItem_exs1())) {
+
+                                                                flag = true;
+                                                            }
+                                                        }
+                                                    }
+                                                    if (flag) {
+                                                        if (lib.isLib_exb2()) {
+                                                            Intent intent = new Intent(ctx, LikeActivity.class);
+                                                            intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img"));
+                                                            startActivity(intent);
+                                                        } else {
+                                                            Intent intent = new Intent(ctx, WebViewActivity.class);
+                                                            intent.putExtra("url", tmp.getItem_exs1());
+                                                            startActivity(intent);
+                                                        }
+                                                    } else {
+                                                        Intent intent = new Intent(ctx, ItemsDetailsAc.class);
+                                                        intent.putExtra(Constant.KEY_PARAM_DATA, lib);
+                                                        intent.putExtra("size", datas.size());
+                                                        intent.putExtra(Constant.KEY_CURRENT_POSITION, curPosition);
+                                                        startActivity(intent);
+                                                    }
+
+
                                                 }
 
                                             }
@@ -413,8 +481,6 @@ public class ItemsFt extends BaseListFt {
                     }
                 });
             } else {
-
-
                 errorView.setVisibility(View.GONE);
             }
 
@@ -437,8 +503,6 @@ public class ItemsFt extends BaseListFt {
         onLoading = true;
         swipeLayout.setRefreshing(true);
         datas = new ArrayList<>();
-
-
         getData();
     }
 
@@ -449,19 +513,210 @@ public class ItemsFt extends BaseListFt {
             RssFeed feed = RssReader.read(url);
             ArrayList<RssItem> rssItems = feed.getRssItems();
             ArrayList<String> list;
-            for (RssItem rssItem : rssItems) {
-                list = new ArrayList<>();
-                list.add(rssItem.getTitle());
-                list.add(XUtil.getDateFull(rssItem.getPubDate()));
-                list.add(rssItem.getLink());
-                ShareAc.saveDataList(lib.getLib_id(), list);
+            if (XUtil.listNotNull(rssItems)) {
+                Collections.reverse(rssItems);
+                for (RssItem rssItem : rssItems) {
+                    list = new ArrayList<>();
+                    list.add(rssItem.getTitle());
+                    list.add(XUtil.getDateFull(rssItem.getPubDate()));
+                    list.add(rssItem.getLink());
+                    Items items = new Items();
+                    //item_exs1
+                    items.setItem_exs1(rssItem.getLink());
+                    ShareAc.saveDataList(lib.getLib_id(), list, items);
+                }
             }
+            list = new ArrayList<>();
+            list.add(XUtil.getDateFullSec());
+            ShareAc.saveDataList(lib.getLib_id(), list);
+
+
         } catch (Exception e) {
 
             e.printStackTrace();
         }
     }
 
+    public void getApiByQuery(final Lib lib) {
+        try {
+            RequestQueue mVolleyQueue = Volley.newRequestQueue(ctx);
+            final List<Fields> datas = Dbutils.getFields(lib.getLib_id());
+            String baseUrl = "";
+            for (int i = 0; i < datas.size(); i++) {
+                Fields tmp = datas.get(i);
+                if (tmp.getFields_type() == EnumData.FieldsTypeEnum.FIELDS_TEXT.getValue()) {
+                    String name = tmp.getFields_name();
+                    if (i == 0) {
+                        baseUrl = name;
+                    }
+
+                }
+            }
+            if (XUtil.isEmptyOrNull(baseUrl)) {
+                XUtil.tShort("检查URL");
+                return;
+            }
+            MyStringRequest myStringRequest = new MyStringRequest(Request.Method.GET, baseUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        String ret = response.toString();
+
+                        XUtil.debug("ret::" + ret);
+
+                        org.json.JSONObject obj = new org.json.JSONObject(ret);
+
+
+                        String _url = "";
+                        String _link = "";
+
+                        Map<Integer, String> map = new HashMap<Integer, String>();
+                        Map<Integer, ArrayList<String>> mapOut = new HashMap<Integer, ArrayList<String>>();
+                        for (int i = 0; i < datas.size(); i++) {
+                            Fields tmp = datas.get(i);
+                            if (tmp.getFields_type() == EnumData.FieldsTypeEnum.FIELDS_TEXT.getValue()) {
+                                int _id = tmp.getFields_id();
+                                String name = tmp.getFields_name();
+                                if (i == 0) {
+                                } else if (i == 1) {
+                                    _url = name;
+                                } else {
+//                                    items.add(name);
+                                    map.put(_id, name);
+                                }
+                                XUtil.debug("name===>>" + name);
+                            }
+                        }
+
+                        if (XUtil.isEmptyOrNull(_url)) {
+                            return;
+                        }
+                        String item = "";
+                        if (_url.contains("/")) {
+                            String arr[] = _url.split("\\/");
+                            if (arr.length == 5) {
+                                item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getJSONObject(arr[3]).getString(arr[4]);
+                            } else if (arr.length == 4) {
+                                item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getString(arr[3]);
+                            } else if (arr.length == 3) {
+                                item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getString(arr[2]);
+                            } else if (arr.length == 2) {
+                                item = obj.getJSONObject(arr[0]).getString(arr[1]);
+                            }
+
+                        } else {
+                            item = obj.getString(_url);
+                        }
+
+
+                        JSONArray list1 = JSON.parseArray(item);
+//                        for (Object tmp : list
+//                                ) {
+//                            XUtil.debug("tmp:::" + tmp.ge);
+//
+
+                        if (XUtil.listNotNull(list1)) {
+                            Collections.reverse(list1);
+                        }
+
+                        for (int i = 0; i < list1.size(); i++) {
+                            Map<String, Object> tmpMap = new HashMap<>();
+                            String link = "";
+                            for (Integer in : map.keySet()) {
+                                String value = map.get(in);
+                                boolean isUrl = false;
+                                if (XUtil.notEmptyOrNull(value) && value.startsWith("@")) {
+                                    value = value.substring(1);
+                                    isUrl = true;
+                                }
+                                String tmp = list1.getJSONObject(i).get(value) + "";
+                                if (isUrl) {
+                                    link = tmp;
+                                } else {
+                                    link = "";
+                                }
+                                tmpMap.put(in + "", tmp);
+                            }
+                            JSON json = new JSONObject(tmpMap);
+                            XUtil.debug("json:" + json + " " + tmpMap);
+                            if (map.size() > 0) {
+                                Items items = new Items(lib.getLib_id(), json.toJSONString());
+                                if (XUtil.notEmptyOrNull(link)) {
+                                    items.setItem_exs1(link);
+                                }
+                                Dbutils.addItems(items);
+                            }
+
+                        }
+
+
+                        ArrayList list = new ArrayList<>();
+                        list.add(XUtil.getDateFullSec());
+                        ShareAc.saveDataList(lib.getLib_id(), list);
+                        EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
+
+//
+//                        }
+//                        for (Integer in : map.keySet()) {
+//                            ArrayList<String> list = new ArrayList<String>();
+//                            for (int i = 0; i < list1.size(); i++) {
+//                                String value = map.get(in);
+//                                Object tmp = list1.getJSONObject(i).get(value);
+////                                XUtil.debug("===>>>" + tmp + " " + value);
+//                                list.add(tmp + "");
+//                            }
+//
+//                            mapOut.put(in, list);
+//                        }
+//
+//
+//                        Map<String, Object> tmpMap;
+//
+//                        for (Integer in : mapOut.keySet()) {
+//                            tmpMap = new HashMap<>();
+//
+//                            ArrayList<String> list = new ArrayList<String>();
+//                            list = mapOut.get(in);
+//                            for (int i = 0; i < list.size(); i++) {
+//                                String tmp = list.get(i);
+//                                tmpMap.put(in + "", tmp);
+//                                JSON json = new JSONObject(tmpMap);
+//                                XUtil.debug("json:" + json + " " + tmpMap);
+//                                if (map.size() > 0) {
+//                                    Items items = new Items(lib.getLib_id(), json.toJSONString());
+//                                    Dbutils.addItems(items);
+//                                }
+//                            }
+//
+//                        }
+
+
+//                        item = new org.json.JSONObject(item).getString("contentlist");
+//                        final ArrayList<Feed> list = (ArrayList<Feed>) JSON.parseArray(item, Feed.class);
+
+//                        final ArrayList<String> items = new ArrayList<>();
+//                        for (Feed tmp : list
+//                                ) {
+//                            XUtil.debug("tmp==>>" + tmp);
+//                            items.add(tmp.getTitle());
+//                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            });
+            myStringRequest.getHeaders().put("apikey", "1e08b47bc5fc83bccc9b6bfb3b4cf1df");
+            mVolleyQueue.add(myStringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onLoadMore() {
@@ -479,7 +734,12 @@ public class ItemsFt extends BaseListFt {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 
-        if (lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value()) {
+        boolean isSys = false;
+
+        if (lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value() || lib.getLib_exi1() == Lib.libType.api.value()
+                || lib.getLib_name().startsWith(Constant.PRE_LIB)
+                ) {
+            isSys = true;
             menu.add("md_refresh").setIcon(XUtil.initIconWhite(Iconify.IconValue.md_refresh)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
@@ -489,13 +749,69 @@ public class ItemsFt extends BaseListFt {
         sub.add(0, 2, 0, "编辑库");
         sub.add(0, 3, 0, "导出CSV");
         sub.add(0, 4, 0, "分享库结构");
-        sub.add(0, 5, 0, "分享库结构");
+        sub.add(0, 5, 0, "复制库结构");
         sub.add(0, 6, 0, "发布库");
+        sub.add(0, 8, 0, "二维码分享");
+        if (isSys) {
+            sub.add(0, 7, 0, "页码");
+            if (lib.isLib_exb2()) {
+                sub.add(0, 9, 0, "非网页详情页");
+            } else {
+                sub.add(0, 9, 0, "网页详情页");
+            }
+        }
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-
     }
 
+    void initEtDlg() {
+        LinearLayout view = new LinearLayout(ctx);
+        view.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//        final EditText editText = new EditText(ctx);
+        final MaterialEditText editText = new MaterialEditText(ctx);
+        editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        editText.setFloatingLabelText("页码");
+        editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+        editText.setFloatingLabelAlwaysShown(true);
+        XUtil.autoKeyBoardShow(editText);
+        editText.setText(lib.getLib_exi2() + "");
+        view.addView(editText);
+        MaterialDialog md = new MaterialDialog.Builder(ctx)
+                .customView(view, true)
+                .positiveText("保存")
+                .negativeText("取消")
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        try {
+                            String content = editText.getText().toString().trim();
+                            if (!XUtil.notEmptyOrNull(content)) {
+                                XUtil.tShort("输入内容~");
+                                XUtil.dismissShowDialog(dialog, false);
+                                return;
+                            }
+                            lib.setLib_exi2(Integer.parseInt(content));
+                            Dbutils.updateLib(lib);
+//                            ctx.myTitle(content);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onNeutral(MaterialDialog materialDialog) {
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                        XUtil.dismissShowDialog(materialDialog, true);
+                    }
+                })
+                .build();
+        md.setCancelable(false);
+        md.show();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -506,32 +822,8 @@ public class ItemsFt extends BaseListFt {
         }
 
         if (item.getTitle().equals("md_refresh")) {
-            if (lib.getLib_exi1() == Lib.libType.rss.value()) {
-                if (!XUtil.notEmptyOrNull(lib.getLib_exs1())) {
-                    XUtil.tShort("Rss源地址有误~");
-                }
-                XUtil.tShort("正在更新Rss源...");
-                Tasks.executeInBackground(ctx, new BackgroundWork<Boolean>() {
-                    @Override
-                    public Boolean doInBackground() throws Exception {
-                        getRssInfo();
-                        return false;
-                    }
-                }, new Completion<Boolean>() {
-                    @Override
-                    public void onSuccess(Context context, Boolean result) {
-                        getData();
-                    }
+            refreshInfo();
 
-                    @Override
-                    public void onError(Context context, Exception e) {
-                    }
-                });
-            }
-            if (lib.getLib_exi1() == Lib.libType.net.value()) {
-                XUtil.tShort("更新数据中，请耐心等待...");
-                ApiUrils.getApiInfo(lib.getLib_name());
-            }
         }
 
         switch (item.getItemId()) {
@@ -540,7 +832,7 @@ public class ItemsFt extends BaseListFt {
                 break;
             case 2:
                 if (lib.getLib_exi1() == Lib.libType.user.value()
-                        || lib.getLib_exi1() == Lib.libType.rss.value()) {
+                        || lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value() || lib.getLib_exi1() == Lib.libType.api.value()) {
                     Intent intent = new Intent(ctx, LibAddAc.class);
                     intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
                     intent.putExtra(Constant.KEY_PARAM_DATA, lib);
@@ -569,10 +861,97 @@ public class ItemsFt extends BaseListFt {
                 XUtil.copyText(ctx, ret);
                 XUtil.tLong("已复制，请粘贴到对话框~");
                 break;
+
+            case 7:
+                initEtDlg();
+                break;
+
+            case 8:
+                String textContent = libInfo();
+
+
+//                Bitmap logo = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
+                TextDrawable drawable = TextDrawable.builder()
+                        .buildRect(lib.getLib_name(), mColorGenerator.getColor(lib.getLib_name()));
+
+                Bitmap logo = drawableToBitamp(drawable);
+                Bitmap mBitmap = CodeUtils.createImage(textContent, 400, 400, logo);
+//                imageView.setImageBitmap(mBitmap);
+                String imgPath = MyPath.getPathImg() + "/qr_" + String.valueOf(System.currentTimeMillis()) + ".png";
+                ImageUtil.saveMyBitmap(mBitmap, imgPath);
+//                XUtil.tShort("二维码已生成至" + imgPath);
+                XUtil.refreshGallery(ctx, imgPath);
+                XUtil.shareImg(ctx, imgPath);
+                break;
+
+            case 9:
+                lib.setLib_exb2(!lib.isLib_exb2());
+                Dbutils.updateLib(lib);
+                XUtil.tShort("已修改~");
+                break;
         }
 
 
         return false;
+    }
+
+    private void refreshInfo() {
+        if (lib.getLib_exi1() == Lib.libType.rss.value()) {
+            if (!XUtil.notEmptyOrNull(lib.getLib_exs1())) {
+                XUtil.tShort("Rss源地址有误~");
+            }
+            XUtil.tShort("正在更新Rss源...");
+            Tasks.executeInBackground(ctx, new BackgroundWork<Boolean>() {
+                @Override
+                public Boolean doInBackground() throws Exception {
+                    getRssInfo();
+                    return false;
+                }
+            }, new Completion<Boolean>() {
+                @Override
+                public void onSuccess(Context context, Boolean result) {
+                    datas = new ArrayList<>();
+                    getData();
+//                    EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
+                }
+
+                @Override
+                public void onError(Context context, Exception e) {
+                }
+            });
+        }
+        if (lib.getLib_exi1() == Lib.libType.net.value()) {
+            XUtil.tShort("更新数据中，请耐心等待...");
+            ApiUrils.getApiInfo(lib);
+        }
+        if (lib.getLib_exi1() == Lib.libType.api.value()) {
+            XUtil.tShort("更新数据中，请耐心等待...");
+            getApiByQuery(lib);
+        }
+
+        if (lib.getLib_name().startsWith(Constant.PRE_LIB)) {
+
+            XUtil.tShort("更新数据中，请耐心等待...");
+
+            ApiUrils.getApiInfo(lib);
+
+        }
+    }
+
+    private Bitmap drawableToBitamp(Drawable drawable) {
+        int w = 120;
+        int h = 120;
+        System.out.println("Drawable转Bitmap");
+        Bitmap.Config config =
+                drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+                        : Bitmap.Config.RGB_565;
+        Bitmap bitmap = Bitmap.createBitmap(w, h, config);
+        //注意，下面三行代码要用到，否在在View或者surfaceview里的canvas.drawBitmap会看不到图
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, w, h);
+        drawable.draw(canvas);
+        return bitmap;
     }
 
     @NonNull

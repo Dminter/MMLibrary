@@ -2,6 +2,8 @@ package com.zncm.library.ui;
 
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -99,7 +101,24 @@ public class SettingActivity extends MaterialSettings {
                         .show();
             }
         }));
+        addItem(new TextItem(ctx, "").setTitle("导入剪切板数据").setSubtitle("复制数据，点击即可粘贴").setOnclick(new TextItem.OnClickListener() {
+            @Override
+            public void onClick(TextItem textItem) {
 
+                String newPath = MyPath.getPathData() + File.separator + XUtil.getDateY_M_D() + File.separator + XUtil.getDateY_M_D_H_M_S() + ".txt";
+
+                ClipboardManager myClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData abc = myClipboard.getPrimaryClip();
+                ClipData.Item item = abc.getItemAt(0);
+                String text = item.getText().toString();
+                if (XUtil.notEmptyOrNull(text)) {
+                    XUtil.contentToTxt(newPath, text);
+                    getData(ctx, newPath);
+                } else {
+                    XUtil.tShort("剪切板没有数据~");
+                }
+            }
+        }));
 
         addItem(new TextItem(ctx, "").setTitle("导入联系人/短信").setOnclick(new TextItem.OnClickListener() {
             @Override
@@ -296,6 +315,26 @@ public class SettingActivity extends MaterialSettings {
             }
         }));
 
+        addItem(new CheckboxItem(this, "").setTitle("详情显示创建/修改时间").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
+                MySp.put(SpConstant.isShowTime, isChecked);
+            }
+        }).setDefaultValue(MySp.get(SpConstant.isShowTime, Boolean.class, true)));
+        addItem(new CheckboxItem(this, "").setTitle("详情显示标题").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
+                MySp.put(SpConstant.isShowTitle, isChecked);
+            }
+        }).setDefaultValue(MySp.get(SpConstant.isShowTitle, Boolean.class, true)));
+
+
+        addItem(new CheckboxItem(this, "").setTitle("网络库/Rss直接打开网页").setSubtitle("列表点击跳过详情页，直接打开链接").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
+                MySp.put(SpConstant.isOpenUrl, isChecked);
+            }
+        }).setDefaultValue(MySp.get(SpConstant.isOpenUrl, Boolean.class, false)));
 
     }
 

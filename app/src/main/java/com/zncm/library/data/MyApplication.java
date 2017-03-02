@@ -10,6 +10,7 @@ import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.XUtil;
@@ -21,12 +22,14 @@ public class MyApplication extends Application {
     public static ImageLoader imageLoader;
     public static String[] tags;
     ClipboardManager cb;
+     private String myLastClipboard = "";
 
     @Override
     public void onCreate() {
         super.onCreate();
         this.ctx = this.getApplicationContext();
         instance = this;
+        ZXingLibrary.initDisplayOpinion(this);
         initImageLoader();
         tags = new String[]{
                 "聊天", "收藏", "影视", "动漫", "书籍", "实用", "商业",
@@ -47,7 +50,10 @@ public class MyApplication extends Application {
                 // 具体实现
                 String content = cb.getText().toString();
                 if (MySp.getClipboardListen()) {
-                    ShareAc.initSave(Constant.SYS_CLIPBOARD, content, "");
+                    if (XUtil.isEmptyOrNull(myLastClipboard) || !myLastClipboard.equals(content)) {
+                        myLastClipboard = content;
+                        ShareAc.initSave(Constant.SYS_CLIPBOARD, content, "");
+                    }
                 }
             }
         });

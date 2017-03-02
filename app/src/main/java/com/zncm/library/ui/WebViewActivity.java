@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.malinskiy.materialicons.Iconify;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nanotasks.BackgroundWork;
@@ -24,12 +28,21 @@ import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 import com.zncm.library.R;
 import com.zncm.library.data.Constant;
+import com.zncm.library.data.EnumData;
+import com.zncm.library.data.Fields;
+import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
+import com.zncm.library.data.MyApplication;
+import com.zncm.library.data.RefreshEvent;
+import com.zncm.library.data.VideoInfo;
 import com.zncm.library.utils.DbHelper;
+import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.FileMiniUtil;
 import com.zncm.library.utils.MyPath;
+import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.NotiHelper;
 import com.zncm.library.utils.XUtil;
+import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,7 +51,18 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
+
+import de.greenrobot.event.EventBus;
+
+import static com.zncm.library.utils.ApiUrils.myLib;
 
 
 public class WebViewActivity extends BaseAc {
@@ -48,6 +72,10 @@ public class WebViewActivity extends BaseAc {
     private Activity ctx;
     static boolean isImport = false;
     MaterialSearchView searchView;
+
+    Set<String> urlSet = new HashSet<>();
+    ArrayList<String> urls = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,8 +136,12 @@ public class WebViewActivity extends BaseAc {
                     }
                 });
 
-                mWebView.loadUrl(url);
+//                mWebView.loadUrl(url);
+
                 WebViewActivity.this.url = url;
+
+                initData();
+
                 return true;
             }
         });
@@ -119,7 +151,8 @@ public class WebViewActivity extends BaseAc {
                 getSupportActionBar().setTitle(view.getTitle());
 
                 if (progress == 100 && XUtil.notEmptyOrNull(view.getTitle())) {
-                    ShareAc.initSave(Constant.SYS_NET_HISTORY, url, view.getTitle());
+                    XUtil.debug("progress == 100" + url + " " + view.getTitle());
+
                 }
             }
         });
@@ -132,8 +165,22 @@ public class WebViewActivity extends BaseAc {
             @Override
             public void onDownloadStart(final String url, String userAgent, String contentDisposition,
                                         String mimetype, long contentLength) {
-                XUtil.tShort("文件正在下载，请稍后...");
-                downloadFile(WebViewActivity.this, url, isImport);
+
+                new MaterialDialog.Builder(ctx)
+                        .title("文件")
+                        .content("确认下载" + url)
+                        .positiveText("下载")
+                        .negativeText("取消")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                XUtil.tShort("文件正在下载，请稍后...");
+                                downloadFile(WebViewActivity.this, url, isImport);
+                            }
+                        }).show();
+
+
             }
         });
         searchView = (MaterialSearchView) ctx.findViewById(R.id.search_view);
@@ -169,6 +216,26 @@ public class WebViewActivity extends BaseAc {
         });
 
 
+    }
+
+
+    public static class MyTask extends AsyncTask<String, Void, Void> {
+
+        protected Void doInBackground(String... params) {
+            try {
+                String content = ContentExtractor.getContentByURL(params[0]);
+                ShareAc.initSave(Constant.SYS_NET_TEXT, content, params[1]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+        }
     }
 
 
@@ -243,7 +310,13 @@ public class WebViewActivity extends BaseAc {
         if (!XUtil.notEmptyOrNull(url)) {
             return;
         }
+        if (urlSet.add(url)) {
+            urls.add(url);
+        }
         mWebView.loadUrl(url);
+        ShareAc.initSave(Constant.SYS_NET_HISTORY, url, url);
+//        MyTask myTask = new MyTask();
+//        myTask.execute(url, url);
     }
 
 
@@ -271,6 +344,8 @@ public class WebViewActivity extends BaseAc {
                 break;
             case 2:
                 ShareAc.initSave(Constant.SYS_COLLECT, url, mWebView.getTitle());
+
+
                 XUtil.tShort("已收藏网址");
                 break;
             case 3:
@@ -305,6 +380,47 @@ public class WebViewActivity extends BaseAc {
             case 7:
                 searchView.showSearch(true);
                 break;
+            case 8:
+                if (XUtil.listNotNull(urls)) {
+                    url = urls.get(urls.size() - 1);
+                }
+                initData();
+                break;
+
+            case 9:
+                Lib data = Dbutils.getLibSys(Constant.SYS_NET_HISTORY);
+                if (data != null) {
+                    Intent intent = new Intent(ctx, ItemsAc.class);
+                    intent.putExtra(Constant.KEY_PARAM_DATA, data);
+                    startActivity(intent);
+                }
+                break;
+
+
+            case 10:
+                ShareAc.initLibNet(url, "li");
+                XUtil.tShort("已添加到网络库！");
+                break;
+
+
+            case 11:
+                geUrlHtml(url);
+                break;
+            case 12:
+                ShareAc.initLibRss(url, url);
+                XUtil.tShort("已添加RSS源！");
+                break;
+
+            case 13:
+                Intent intent = new Intent(ctx, PlayActivity.class);
+                intent.putExtra(Constant.KEY_PARAM_DATA, new VideoInfo(url, url));
+                startActivity(intent);
+                break;
+
+            case 14:
+                ShareAc.initLibApi(url, "results");
+                XUtil.tShort("已添加到API库！");
+                break;
 
             default:
                 break;
@@ -313,6 +429,45 @@ public class WebViewActivity extends BaseAc {
         return super.onOptionsItemSelected(item);
     }
 
+    private void geUrlHtml(final String url) {
+        try {
+
+            //XUtil.tShort(Constant.SYS_BAIDU_BK + "-正在下载，第" + page + "页");
+            Tasks.executeInBackground(MyApplication.getInstance().ctx, new BackgroundWork<String>() {
+                @Override
+                public String doInBackground() throws Exception {
+                    String htmlStr = "";
+                    try {
+                        if (XUtil.isEmptyOrNull(url)) {
+                            return htmlStr;
+                        }
+                        Document doc = Jsoup.connect(url).timeout(3000).get();
+                        htmlStr = doc.html();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return htmlStr;
+                }
+            }, new Completion<String>() {
+                @Override
+                public void onSuccess(Context context, String result) {
+                    if (XUtil.notEmptyOrNull(result)) {
+                        Intent newIntent = new Intent(context, ShowInfoActivity.class);
+                        newIntent.putExtra("show", result);
+                        context.startActivity(newIntent);
+                    }
+                }
+
+                @Override
+                public void onError(Context context, Exception e) {
+                }
+            });
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -325,6 +480,13 @@ public class WebViewActivity extends BaseAc {
         sub.add(0, 5, 0, "刷新");
         sub.add(0, 6, 0, "收藏");
         sub.add(0, 7, 0, "百度一下");
+        sub.add(0, 8, 0, "上一页");
+        sub.add(0, 9, 0, "历史记录");
+        sub.add(0, 10, 0, "添加到网络库");
+        sub.add(0, 11, 0, "html源码");
+        sub.add(0, 12, 0, "添加RSS源");
+        sub.add(0, 13, 0, "播放页面视频");
+        sub.add(0, 14, 0, "添加到API库");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }

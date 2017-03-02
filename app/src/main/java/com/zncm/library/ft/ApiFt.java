@@ -20,6 +20,7 @@ import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 import com.zncm.library.R;
+import com.zncm.library.data.ApiData.Feed;
 import com.zncm.library.data.ApiData.Joke;
 import com.zncm.library.data.ApiData.News;
 import com.zncm.library.data.ApiData.NewsUrls;
@@ -117,7 +118,7 @@ public class ApiFt extends BaseFt {
                         .itemsCallback(new MaterialDialog.ListCallback() {
                             @Override
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                Lib data = Dbutils.findSysLib(items[which],0);
+                                Lib data = Dbutils.findSysLib(items[which], 0);
                                 if (data == null) {
                                     XUtil.tShort("暂无数据~~");
                                     return;
@@ -169,7 +170,7 @@ public class ApiFt extends BaseFt {
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         switch (which) {
                             case 0:
-                                Lib data = Dbutils.findSysLib(lib,0);
+                                Lib data = Dbutils.findSysLib(lib, 0);
                                 if (data == null) {
                                     return;
                                 }
@@ -533,6 +534,10 @@ public class ApiFt extends BaseFt {
                     if (myQueue.isEmpty()) {
                         int pageNo = MySp.getapi_bdbk() + pageCount;
                         MySp.setapi_bdbk(pageNo);
+                        ArrayList<String> list = new ArrayList<>();
+                        list = new ArrayList<>();
+                        list.add(XUtil.getDateFullSec());
+                        ShareAc.saveDataList(Constant.SYS_BAIDU_BK, list);
                         btn.setText(Constant.SYS_BAIDU_BK + "-" + XUtil.getDateFull());
                     } else {
                         getDataBdbk(myQueue, btn);
@@ -545,6 +550,73 @@ public class ApiFt extends BaseFt {
             });
 
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void getFeedsByQuery(final Context ctx, final String query) {
+        try {
+            RequestQueue mVolleyQueue = Volley.newRequestQueue(ctx);
+            String url = "https://cloud.feedly.com/v3/search/feeds?query=" + query;
+            MyStringRequest myStringRequest = new MyStringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        String ret = response.toString();
+                        org.json.JSONObject obj = new org.json.JSONObject(ret);
+                        String item = obj.getString("results");
+//                        item = new org.json.JSONObject(item).getString("contentlist");
+                        final ArrayList<Feed> list = (ArrayList<Feed>) JSON.parseArray(item, Feed.class);
+
+                        final ArrayList<String> items = new ArrayList<>();
+                        for (Feed tmp : list
+                                ) {
+//                            ArrayList<String> strs = new ArrayList<>();
+//                            if (tmp != null) {
+//                                strs.add(tmp.getTitle());
+//                                strs.add(tmp.getImg());
+//                                ShareAc.initSaveList(Constant.SYS_XH_PIC, Constant.SYS_XH_PIC_MK, strs);
+//                            }
+                            XUtil.debug("tmp==>>" + tmp);
+                            items.add(tmp.getTitle());
+                        }
+
+
+                        new MaterialDialog.Builder(ctx)
+                                .items(items)
+                                .itemsCallback(new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                        String content = list.get(which).getFeedId();
+                                        if (XUtil.notEmptyOrNull(content)) {
+                                            if (content.startsWith("feed/")) {
+                                                content = content.replaceFirst("feed/", "");
+                                            }
+                                            ShareAc.initLibRss(items.get(which), content);
+                                            EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
+                                            XUtil.tShort("已添加" + items.get(which));
+//                                            return;
+//                                            XUtil.dismissShowDialog(dialog, false);
+                                        }
+                                    }
+                                })
+                                .autoDismiss(false)
+                                .show();
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            });
+            myStringRequest.getHeaders().put("apikey", "1e08b47bc5fc83bccc9b6bfb3b4cf1df");
+            mVolleyQueue.add(myStringRequest);
         } catch (Exception e) {
             e.printStackTrace();
         }

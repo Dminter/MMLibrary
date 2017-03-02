@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.zncm.library"
     android:installLocation="auto">
 
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+
+    <uses-sdk tools:overrideLibrary="com.shuyu.gsyvideoplayer" />
+
     <application
         android:name=".data.MyApplication"
         android:allowBackup="true"
@@ -22,6 +25,7 @@
         <activity android:name=".ui.LibAddAc" />
         <activity android:name=".ui.LibAc" />
         <activity android:name=".ui.ItemsAddAc" />
+        <activity android:name=".ui.QRActivity" />
 
         <activity
             android:name=".ui.SettingActivity"
@@ -33,10 +37,12 @@
             android:launchMode="singleTop"
             android:theme="@style/MainTheme" />
         <activity android:name=".ui.ShowInfoActivity" />
+        <activity android:name=".ui.LikeActivity" />
         <activity android:name=".ui.ItemsAc">
 
         </activity>
         <activity android:name=".ui.ShareAc">
+
             <intent-filter>
                 <action android:name="android.intent.action.SEND"></action>
 
@@ -74,6 +80,7 @@
         <activity android:name=".ui.LocLibAc" />
         <activity android:name=".ui.PhotoAc" />
         <activity android:name=".ui.ApiAc" />
+        <activity android:name=".ui.PlayActivity" />
         <activity
             android:name=".ui.SettingAc"
             android:theme="@style/SettingTheme" />

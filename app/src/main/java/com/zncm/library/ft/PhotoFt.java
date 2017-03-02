@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,6 +53,12 @@ public class PhotoFt extends BaseFt {
         if (ctx.getIntent().getExtras() != null) {
             url = ctx.getIntent().getExtras().getString("url");
         }
+        final PhotoView photoView = showImg(ctx, url);
+        return photoView;
+    }
+
+    @NonNull
+    public static PhotoView showImg(final BaseAc ctx, String url) {
         final PhotoView photoView = new PhotoView(ctx);
         MyApplication.imageLoader.displayImage(url,
                 photoView, new SimpleImageLoadingListener() {

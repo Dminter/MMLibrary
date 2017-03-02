@@ -3,6 +3,7 @@ package com.zncm.library.utils;
 import android.content.Context;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -17,25 +18,42 @@ import com.zncm.library.data.ApiData.NewsUrls;
 import com.zncm.library.data.ApiData.WxHot;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
+import com.zncm.library.data.Fields;
+import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
+import com.zncm.library.data.ObjEvent;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.ui.ShareAc;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
 
 public class ApiUrils {
 
-    public static void getApiInfo(String lib) {
+
+    public static Lib myLib;
+    public static int topItem;
+
+    public static String preUrl;
+    public static String endUrl;
+
+    public static void getApiInfo(Lib libinfo) {
+        String lib = libinfo.getLib_name();
         int pageCount = MySp.getapi_page();
         Queue<Integer> queue = new ArrayDeque<>();
         int api_page = 0;
@@ -51,7 +69,13 @@ public class ApiUrils {
             api_page = MySp.getapi_xhpic();
         } else if (lib.equals(Constant.SYS_BAIDU_BK)) {
             api_page = MySp.getapi_bdbk();
+        } else {
+            //if (lib.startsWith(Constant.PRE_LIB) || myLib.getLib_exi1() == Lib.libType.net.value())
+            myLib = libinfo;
+            api_page = myLib.getLib_exi2();
         }
+
+
         for (int i = api_page; i < pageCount + api_page; i++) {
             queue.add(i);
         }
@@ -67,6 +91,9 @@ public class ApiUrils {
             getDataXhPic(queue);
         } else if (lib.equals(Constant.SYS_BAIDU_BK)) {
             getDataBdbk(queue);
+        } else {
+            //if (lib.startsWith(Constant.PRE_LIB))
+            getDataJsoup(queue);
         }
     }
 
@@ -374,12 +401,241 @@ public class ApiUrils {
                 @Override
                 public void onSuccess(Context context, Boolean result) {
                     if (myQueue.isEmpty()) {
-                        EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
                         int pageNo = MySp.getapi_bdbk() + MySp.getapi_page();
                         MySp.setapi_bdbk(pageNo);
-                        XUtil.tShort(Constant.SYS_BAIDU_BK + "-" + XUtil.getDateFull());
+                        ArrayList<String> strs = new ArrayList<>();
+                        strs.add(XUtil.getDateFullSec());
+                        ShareAc.initSaveList(Constant.SYS_BAIDU_BK, Constant.SYS_BAIDU_BK_MK, strs);
+                        XUtil.tShort(Constant.SYS_BAIDU_BK + "-" + XUtil.getDateFullSec());
+                        EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
                     } else {
                         getDataBdbk(myQueue);
+                    }
+                }
+
+                @Override
+                public void onError(Context context, Exception e) {
+                }
+            });
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void getDataJsoup(final Queue<Integer> myQueue) {
+        try {
+
+            final int page = myQueue.poll();
+            //XUtil.tShort(Constant.SYS_BAIDU_BK + "-正在下载，第" + page + "页");
+            Tasks.executeInBackground(MyApplication.getInstance().ctx, new BackgroundWork<Boolean>() {
+                @Override
+                public Boolean doInBackground() throws Exception {
+                    try {
+                        if (myLib == null) {
+                            return false;
+                        }
+                        String _url = "";
+                        String _link = "";
+                        List<Fields> datas = Dbutils.getFields(myLib.getLib_id());
+//                        ArrayList<String> items = new ArrayList<String>();
+                        Map<Integer, String> map = new HashMap<Integer, String>();
+                        Map<Integer, ArrayList<String>> mapOut = new HashMap<Integer, ArrayList<String>>();
+
+                        for (int i = 0; i < datas.size(); i++) {
+                            Fields tmp = datas.get(i);
+                            if (tmp.getFields_type() == EnumData.FieldsTypeEnum.FIELDS_TEXT.getValue()) {
+                                int _id = tmp.getFields_id();
+                                String name = tmp.getFields_name();
+                                if (i == 0) {
+                                    _url = name;
+                                } else {
+//                                    items.add(name);
+                                    map.put(_id, name);
+                                    topItem = _id;
+
+
+                                }
+                                XUtil.debug("name===>>" + name);
+                            }
+                        }
+
+                        boolean flag = false;
+
+                        String url = _url;
+                        if (_url.contains("[") && _url.contains("]")) {
+                            preUrl = _url.substring(0, _url.indexOf("["));
+                            endUrl = _url.substring(_url.lastIndexOf("]") + 1, _url.length());
+                            flag = true;
+                            XUtil.debug("preUrl::" + preUrl + " - " + endUrl);
+                            url = preUrl + page + endUrl;
+                            XUtil.debug("realurl::" + url);
+                        } else {
+                            myQueue.removeAll(myQueue);
+                        }
+                        Document doc = Jsoup.connect(url).timeout(3000).get();
+//                        XUtil.debug("doc==>>"+doc.outerHtml());
+                        ArrayList<String> dlist = new ArrayList<String>();
+                        for (Integer in : map.keySet()) {
+                            String elementsKey = map.get(in);
+                            Elements elements = doc.select(elementsKey);
+                            if (elements == null || elements.size() == 0) {
+                                elements = doc.getElementsByClass(elementsKey);
+                            }
+                            if (elements == null || elements.size() == 0) {
+                                elements = doc.getElementsByTag(elementsKey);
+                            }
+                            if (elements == null || elements.size() == 0) {
+                                elements = doc.getElementsByAttribute(elementsKey);
+                            }
+                            ArrayList<String> list = new ArrayList<String>();
+
+                            dlist = new ArrayList<String>();
+                            if (XUtil.listNotNull(elements)) {
+                                Collections.reverse(elements);
+                                for (Element element : elements) {
+                                    String _durl = element.select("a").attr("href");
+//                                    if (elementsKey.contains("img")) {
+//                                        _durl = element.attr("src");
+//                                    }
+
+                                    int index = -1;
+
+                                    XUtil.debug("_durl==?" + _durl);
+                                    if (XUtil.notEmptyOrNull(_durl) && _durl.startsWith("/")) {
+                                        String base = doc.baseUri();
+//                                        String base = element.baseUri();
+                                        if (XUtil.notEmptyOrNull(base) && base.endsWith("/")) {
+                                            base = base.substring(0, base.length() - 1);
+
+
+
+                                        }
+                                        if (base.startsWith("http")) {
+                                            index = base.indexOf('/', base.indexOf('/') + 2);
+
+                                        } else {
+                                            index = base.indexOf('/');
+                                        }
+
+                                        if (index != -1) {
+                                            base = base.substring(0, index);
+
+                                        }
+
+                                        XUtil.debug("base::" + base);
+
+//                                        String tmp = _durl.substring(0, _durl.lastIndexOf("/"));
+//                                        if (base.contains(tmp)) {
+//                                            _durl = base + _durl.substring(_durl.lastIndexOf("/") + 1, _durl.length());
+//
+//                                        } else {
+//
+//                                        }
+                                        _durl = base + _durl;
+
+
+                                    }
+//                                    if (elementsKey.contains("img")) {
+//                                        list.add(_durl);
+//                                    } else {
+//                                        list.add(element.text());
+//                                    }
+
+
+                                    if (XUtil.isEmptyOrNull(element.text())) {
+                                        String srcStr = element.attr("src");
+                                        list.add(srcStr);
+                                    } else {
+                                        list.add(element.text());
+                                    }
+//                                    XUtil.debug("---->>>" + element.text() + "  --- " + list);
+//                                    _durl = "http://www.topit.me/tag/%E5%A3%81%E7%BA%B8?p=" + new Random().nextInt();
+                                    dlist.add(_durl);
+//                                    XUtil.debug("  " + element.html() + "-- " + _durl);
+                                }
+                            } else {
+                                list.add(doc.html());
+                            }
+
+                            mapOut.put(in, list);
+                        }
+
+                        XUtil.debug("map:::" + map);
+                        XUtil.debug("mapOut:::" + mapOut);
+                        Map<String, Object> tmpMap;
+
+                        for (Integer in : mapOut.keySet()) {
+                            tmpMap = new HashMap<>();
+
+                            ArrayList<String> list = new ArrayList<String>();
+                            list = mapOut.get(in);
+                            for (int i = 0; i < list.size(); i++) {
+                                String tmp = list.get(i);
+                                tmpMap.put(in + "", tmp);
+                                JSON json = new JSONObject(tmpMap);
+                                XUtil.debug("json:" + json + " " + tmpMap);
+                                if (map.size() > 0) {
+                                    Items items = new Items(myLib.getLib_id(), json.toJSONString());
+                                    try {
+                                        if (XUtil.listNotNull(dlist)) {
+                                            String curUrl = dlist.get(i);
+                                            if (XUtil.notEmptyOrNull(curUrl)) {
+                                                items.setItem_exs1(curUrl);
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    Dbutils.addItems(items);
+                                }
+                            }
+
+                        }
+
+
+//                        String url = "http://wapbaike.baidu.com/view/" + page + ".htm";
+//                        Document doc = Jsoup.connect(url).timeout(1000).get();
+//                        Elements elements = doc.getElementsByClass("summary-content");
+//                        String mConent = elements.text().toString();
+//                        String mTitle = doc.title().toString();
+//                        mTitle = mTitle.replaceAll("_百度百科", "");
+//                        mConent = mConent.replaceAll("\\[.*?]", "").replaceAll("百科名片 ", "");
+//                        XUtil.debug("mTitle:" + mTitle + "  mConent:" + mConent);
+//                        ArrayList<String> strs = new ArrayList<>();
+//                        if (XUtil.notEmptyOrNull(mConent)) {
+//                            strs.add(mTitle);
+//                            strs.add(mConent);
+//                            strs.add(url);
+//                        }
+//                        ShareAc.initSaveList(Constant.SYS_BAIDU_BK, Constant.SYS_BAIDU_BK_MK, strs);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return false;
+                }
+            }, new Completion<Boolean>() {
+                @Override
+                public void onSuccess(Context context, Boolean result) {
+                    if (myQueue.isEmpty()) {
+
+//                        int pageNo = MySp.getapi_bdbk() + MySp.getapi_page();
+//                        MySp.setapi_bdbk(pageNo);
+//                        XUtil.tShort(Constant.SYS_BAIDU_BK + "-" + XUtil.getDateFull());
+                        myLib.setLib_exi2(myLib.getLib_exi2() + MySp.getapi_page());
+                        Dbutils.updateLib(myLib);
+
+
+                        if (topItem != 0) {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put(String.valueOf(topItem), XUtil.getDateFullSec());
+                            Dbutils.addItems(new Items(myLib.getLib_id(), new JSONObject(map).toJSONString()));
+                        }
+//                        Dbutils.addItems(new Items(myLib.getLib_id(), "2017年1月9日"));
+                        EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
+                    } else {
+                        getDataJsoup(myQueue);
                     }
                 }
 

@@ -34,14 +34,17 @@ import com.zncm.library.data.Fields;
 import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
+import com.zncm.library.data.SpConstant;
 import com.zncm.library.ui.BaseAc;
 import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
+import com.zncm.library.ui.WebViewActivity;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.FileMiniUtil;
+import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.NotiHelper;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.view.HackyViewPager;
@@ -175,6 +178,7 @@ public class ItemsDetailsFt extends Fragment {
         @Override
         public View instantiateItem(ViewGroup container, int position) {
             items = itemsList.get(position);
+            Dbutils.readItems(items.getItem_id(), true);
             map = JSON.parseObject(items.getItem_json());
             ScrollView scrollView = initViews();
             container.addView(scrollView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -242,12 +246,20 @@ public class ItemsDetailsFt extends Fragment {
                     MaterialEditText editText = new MaterialEditText(ctx);
                     editText.setAutoLinkMask(Linkify.ALL);
                     editText.setHint(tmp.getFields_name());
-                    editText.setFloatingLabelText(tmp.getFields_name());
+                    if (MySp.get(SpConstant.isShowTitle, Boolean.class, true)) {
+                        editText.setFloatingLabelText(tmp.getFields_name());
+
+                    } else {
+                        editText.setHideUnderline(true);
+                    }
+
                     editText.setTextColor(getResources().getColor(R.color.black));
                     editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
                     editText.setFloatingLabelAlwaysShown(true);
                     editText.setKeyListener(null);
                     editText.setFocusable(false);
+
+
                     if (object != null) {
                         String content = ((String) object).trim();
                         if (lib.getLib_exi1() == Lib.libType.rss.value()) {
@@ -417,22 +429,66 @@ public class ItemsDetailsFt extends Fragment {
                 }
             }
         }
-        StringBuffer info = new StringBuffer();
-        info.append("创建时间：").append(XUtil.getDateFull(items.getItem_time())).append("\n");
-        info.append("修改时间：").append(XUtil.getDateFull(items.getItem_modify_time())).append("\n");
-        if (XUtil.notEmptyOrNull(info.toString())) {
-            MaterialEditText editText = new MaterialEditText(ctx);
-            editText.setAutoLinkMask(Linkify.ALL);
-            editText.setFloatingLabelText("信息");
-            editText.setTextColor(getResources().getColor(R.color.black));
-            editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
-            editText.setFloatingLabelAlwaysShown(true);
-            editText.setEnabled(false);
-            editText.setFocusable(false);
-            linearLayout.addView(editText);
-            editText.setText(info.toString());
-            scrollView.addView(linearLayout);
+
+        if (MySp.get(SpConstant.isShowTime, Boolean.class, true)) {
+            StringBuffer info = new StringBuffer();
+            info.append("创建时间：").append(XUtil.getDateFull(items.getItem_time())).append("\n");
+            info.append("修改时间：").append(XUtil.getDateFull(items.getItem_modify_time())).append("\n");
+            if (XUtil.notEmptyOrNull(info.toString())) {
+                MaterialEditText editText = new MaterialEditText(ctx);
+//                editText.setAutoLinkMask(Linkify.ALL);
+                if (MySp.get(SpConstant.isShowTitle, Boolean.class, true)) {
+                    editText.setFloatingLabelText("信息");
+
+                } else {
+                    editText.setHideUnderline(true);
+                }
+                editText.setTextColor(getResources().getColor(R.color.black));
+                editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+                editText.setFloatingLabelAlwaysShown(true);
+                editText.setEnabled(false);
+                editText.setFocusable(false);
+                linearLayout.addView(editText);
+                editText.setText(info.toString());
+
+            }
         }
+
+
+        if (XUtil.notEmptyOrNull(items.getItem_exs1())) {
+            StringBuffer info = new StringBuffer();
+            info.append(items.getItem_exs1()).append("\n");
+            if (XUtil.notEmptyOrNull(info.toString())) {
+                MaterialEditText editText = new MaterialEditText(ctx);
+                editText.setAutoLinkMask(Linkify.WEB_URLS);
+                if (MySp.get(SpConstant.isShowTitle, Boolean.class, true)) {
+                    editText.setFloatingLabelText("阅读原文");
+                } else {
+                    editText.setHideUnderline(true);
+                }
+                editText.setTextColor(getResources().getColor(R.color.black));
+                editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+                editText.setFloatingLabelAlwaysShown(true);
+                editText.setEnabled(true);
+                editText.setFocusable(false);
+                editText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        XUtil.debug("diary===>>" + itemsList.get(mViewPager.getCurrentItem()));
+                        Items curItem = itemsList.get(mViewPager.getCurrentItem());
+                        Intent intent = new Intent(ctx, WebViewActivity.class);
+                        intent.putExtra("url", curItem.getItem_exs1());
+                        startActivity(intent);
+                    }
+                });
+
+                linearLayout.addView(editText);
+                editText.setText(info.toString());
+
+            }
+        }
+        scrollView.addView(linearLayout);
         return scrollView;
     }
 
@@ -581,8 +637,48 @@ public class ItemsDetailsFt extends Fragment {
                         XUtil.tShort("已删除~");
                     }
                 }).show();
+//        items = itemsList.get(mViewPager.getCurrentItem());
+//        map = JSON.parseObject(items.getItem_json());
+//        for (Fields tmp : datas) {
+//            Object object = map.get(String.valueOf(tmp.getFields_id()));
+//            String name = tmp.getFields_name();
+//            if (object != null) {
+//                strs.add(name + "：" + object);
+//            }
+//        }
+//
+//        XUtil.debug("strs.get(0)==>" + strs.get(0));
+////        Intent intent = new Intent();
+//
+//
+//        String intentStr = strs.get(0);
+//
+////        intentStr = "<a href=\"intent://scan/" + intentStr + "> Take a QR code </a>";
+////        <a href="intent://scan/#Intent;scheme=zxing;package=com.google.zxing.client.android;end"> Take a QR code </a>
+////        Intent intent = new Intent(Intent.ACTION_VIEW);
+//////        i.setData(Uri.parse(url));
+//////        startActivity(i);
+////START u0 {act=com.tencent.mm.action.WX_SHORTCUT flg=0x14000000 pkg=com.tencent.mm cmp=com.tencent.mm/.plugin.base.stub.WXShortcutEntryActivity bnds=[596,801][810,1045] (has extras)} from uid 10269 on display 0
+////
+////        intent.setData(Uri.parse(intentStr));
+////        startActivity(intent);
+//
+//        try {
+//            Intent intent = UriUtils.parseIntentUri(intentStr, 0);
+//
+//            XUtil.debug("intent>>"+intent.getDataString());
+//            startActivity(intent);
+//
+//
+//
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
 
     }
+
 
     public void onRefresh(Items items) {
         itemsList.set(mViewPager.getCurrentItem(), items);

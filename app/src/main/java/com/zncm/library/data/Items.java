@@ -30,7 +30,7 @@ public class Items extends BaseData {
     private int item_exi5;
 
     @DatabaseField
-    private String item_exs1;
+    private String item_exs1;//to details
     @DatabaseField
     private String item_exs2;
     @DatabaseField
@@ -42,7 +42,7 @@ public class Items extends BaseData {
 
 
     @DatabaseField
-    private boolean item_exb1;
+    private boolean item_exb1;//是否阅读item
     @DatabaseField
     private boolean item_exb2;
     @DatabaseField

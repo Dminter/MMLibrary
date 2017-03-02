@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="scan_corner_color">#0effc2</color>
+
 
     <color name="action_bar">#2DBD60</color>
     <color name="action_button">#2DBD60</color>
@@ -19,8 +21,8 @@
     <color name="holo_blue_dark">#ff0099cc</color>
     <color name="card_list_background">#FFFFFF</color>
     <color name="card_item_background_default">#FDFDFE</color>
-    <color name="card_item_background_pressed">#E6E6E6</color>
-    <color name="card_item_background_pressed_dark">#737373</color>
+    <color name="card_item_background_pressed">@color/material_grey_100</color>
+    <color name="card_item_background_pressed_dark">@color/material_grey_200</color>
     <color name="card_item_shadow">#10000000</color>
 
 
@@ -53,7 +55,7 @@
     <color name="btn_blue_sel">#03aaff</color>
 
 
-    <color name="bg_color">#F9F9F9</color>
+    <color name="bg_color">#FFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="yellow">#FFFF00</color>
     <color name="fuchsia">#FF00FF</color>

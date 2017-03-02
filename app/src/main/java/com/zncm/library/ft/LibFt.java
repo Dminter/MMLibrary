@@ -37,11 +37,14 @@ import com.zncm.library.ui.SettingAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.DoubleClickImp;
+import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.PhoneUtils;
 import com.zncm.library.utils.XUtil;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 import de.greenrobot.event.EventBus;
@@ -104,6 +107,9 @@ public class LibFt extends BaseListFt {
                     } else if (data.getLib_exi1() == Lib.libType.rss.value()) {
                         drawable = TextDrawable.builder()
                                 .buildRect("RSS", mColorGenerator.getColor(data.getLib_name()));
+                    } else if (data.getLib_exi1() == Lib.libType.api.value()) {
+                        drawable = TextDrawable.builder()
+                                .buildRect("API", mColorGenerator.getColor(data.getLib_name()));
                     } else {
                         drawable = TextDrawable.builder()
                                 .buildRect(data.getLib_name().substring(0, 1), mColorGenerator.getColor(data.getLib_name()));
@@ -156,7 +162,7 @@ public class LibFt extends BaseListFt {
                                 switch (which) {
                                     case 0:
                                         if (data.getLib_exi1() == Lib.libType.user.value()
-                                                || data.getLib_exi1() == Lib.libType.rss.value()) {
+                                                || data.getLib_exi1() == Lib.libType.rss.value() || data.getLib_exi1() == Lib.libType.net.value()) {
                                             Intent intent = new Intent(ctx, LibAddAc.class);
                                             intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
                                             intent.putExtra(Constant.KEY_PARAM_DATA, data);
@@ -302,6 +308,10 @@ public class LibFt extends BaseListFt {
         MobclickAgent.onEvent(ctx, "add_lib");
         if (libType == Lib.libType.rss.value()) {
             initRssEtDlg();
+        } else if (libType == Lib.libType.net.value()) {
+            initNetEtDlg();
+        } else if (libType == Lib.libType.api.value()) {
+            initApiEtDlg();
         } else {
             Intent intent = new Intent(ctx, LibAddAc.class);
             startActivity(intent);
@@ -325,6 +335,7 @@ public class LibFt extends BaseListFt {
                 .customView(view, true)
                 .positiveText("保存")
                 .negativeText("取消")
+                .neutralText("搜索")
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
@@ -337,6 +348,158 @@ public class LibFt extends BaseListFt {
                                 return;
                             }
                             ShareAc.initLibRss(content, content);
+                            EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
+                        } catch (Exception e) {
+                        }
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onNeutral(MaterialDialog dialog) {
+                        try {
+
+                            String content = editText.getText().toString().trim();
+                            if (!XUtil.notEmptyOrNull(content)) {
+                                XUtil.tShort("输入内容~");
+                                XUtil.dismissShowDialog(dialog, false);
+                                return;
+                            }
+
+                            ApiFt.getFeedsByQuery(ctx, content);
+
+
+                            XUtil.dismissShowDialog(dialog, false);
+
+                        } catch (Exception e) {
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                        XUtil.dismissShowDialog(materialDialog, true);
+                    }
+                })
+                .autoDismiss(false)
+                .build();
+        md.setCancelable(false);
+        md.show();
+    }
+
+    void initNetEtDlg() {
+        LinearLayout view = new LinearLayout(ctx);
+        view.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        final MaterialEditText editText = new MaterialEditText(ctx);
+        editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editText.setFloatingLabelText("url");
+        editText.setSingleLine();
+        editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+        editText.setFloatingLabelAlwaysShown(true);
+
+
+        final MaterialEditText editText1 = new MaterialEditText(ctx);
+        editText1.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editText1.setFloatingLabelText("div/class");
+        editText1.setSingleLine();
+        editText1.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+        editText1.setFloatingLabelAlwaysShown(true);
+
+
+        XUtil.autoKeyBoardShow(editText);
+
+        LinearLayout linearLayout = new LinearLayout(ctx);
+        linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(editText);
+        linearLayout.addView(editText1);
+        view.addView(linearLayout);
+        MaterialDialog md = new MaterialDialog.Builder(ctx)
+                .customView(view, true)
+                .positiveText("保存")
+                .negativeText("取消")
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        try {
+
+                            String content = editText.getText().toString().trim();
+                            String content1 = editText1.getText().toString().trim();
+                            if (!XUtil.notEmptyOrNull(content)) {
+                                XUtil.tShort("输入内容~");
+                                XUtil.dismissShowDialog(dialog, false);
+                                return;
+                            }
+                            ShareAc.initLibNet(content, content1);
+                            EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
+                        } catch (Exception e) {
+                        }
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onNeutral(MaterialDialog materialDialog) {
+
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog materialDialog) {
+                        XUtil.dismissShowDialog(materialDialog, true);
+                    }
+                })
+                .autoDismiss(false)
+                .build();
+        md.setCancelable(false);
+        md.show();
+    }
+
+    void initApiEtDlg() {
+        LinearLayout view = new LinearLayout(ctx);
+        view.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        final MaterialEditText editText = new MaterialEditText(ctx);
+        editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editText.setFloatingLabelText("url");
+        editText.setSingleLine();
+        editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+        editText.setFloatingLabelAlwaysShown(true);
+
+
+        final MaterialEditText editText1 = new MaterialEditText(ctx);
+        editText1.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editText1.setFloatingLabelText("results");
+        editText1.setSingleLine();
+        editText1.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+        editText1.setFloatingLabelAlwaysShown(true);
+
+
+        XUtil.autoKeyBoardShow(editText);
+
+        LinearLayout linearLayout = new LinearLayout(ctx);
+        linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(editText);
+        linearLayout.addView(editText1);
+        view.addView(linearLayout);
+        MaterialDialog md = new MaterialDialog.Builder(ctx)
+                .customView(view, true)
+                .positiveText("保存")
+                .negativeText("取消")
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        try {
+
+                            String content = editText.getText().toString().trim();
+                            String content1 = editText1.getText().toString().trim();
+
+                            if (!XUtil.notEmptyOrNull(content)) {
+                                XUtil.tShort("输入内容~");
+                                XUtil.dismissShowDialog(dialog, false);
+                                return;
+                            }
+                            ShareAc.initLibApi(content, content1);
                             EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
                         } catch (Exception e) {
                         }

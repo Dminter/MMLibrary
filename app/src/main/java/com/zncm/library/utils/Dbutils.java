@@ -116,6 +116,7 @@ public class Dbutils {
         return datas;
     }
 
+
     public static List<Items> getItemsPage(String query, int lib_id, int pageIndex) {
         init();
         List<Items> datas = new ArrayList<Items>();
@@ -526,6 +527,8 @@ public class Dbutils {
             old.setLib_color(lib.getLib_color());
             old.setLib_exs1(lib.getLib_exs1());
             old.setLib_exi1(lib.getLib_exi1());
+            old.setLib_exi2(lib.getLib_exi2());
+            old.setLib_exb2(lib.isLib_exb2());
             old.setLib_modify_time(System.currentTimeMillis());
             libDao.update(old);
         } catch (Exception e) {

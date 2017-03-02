@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.text.ClipboardManager;
@@ -24,15 +24,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.malinskiy.materialicons.IconDrawable;
 import com.malinskiy.materialicons.Iconify;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.download.ImageDownloader;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.zncm.library.R;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.Lib;
@@ -40,9 +36,13 @@ import com.zncm.library.data.MyApplication;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.ShowInfoActivity;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -174,6 +174,24 @@ public class XUtil {
         return getDeviceMetrics().heightPixels;
     }
 
+    // 刷新 图库，（及时显示图片）
+    public static void refreshGallery(Context ctx, String filePath) {
+        MediaScannerConnection.scanFile(ctx, new String[]{filePath}, null, null);
+    }
+
+
+    public static void shareImg(Context ctx, String imgPath) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        File f = new File(imgPath);
+        if (f != null && f.exists() && f.isFile()) {
+            intent.setType("image/jpg");
+            Uri u = Uri.fromFile(f);
+            intent.putExtra(Intent.EXTRA_STREAM, u);
+        }
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ctx.startActivity(Intent.createChooser(intent, "分享"));
+    }
+
     //双击大段文本预览
     public static void doubleTextPre(final Context ctx, View tvText, final String texts) {
         if (tvText == null || isEmptyOrNull(texts)) {
@@ -215,6 +233,7 @@ public class XUtil {
             return false;
         }
     }
+
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -234,6 +253,7 @@ public class XUtil {
             );
         }
     }
+
     public static void initIndicatorTheme(PagerSlidingTabStrip indicator) {
         Context ctx = MyApplication.getInstance().ctx;
         indicator.setTextSize(dip2px(16));
@@ -325,6 +345,10 @@ public class XUtil {
 
     public static String getDateFull() {
         return new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(new Date());
+    }
+
+    public static String getDateFullSec() {
+        return new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss").format(new Date());
     }
 
     public static String getDateFull(Date date) {
@@ -451,28 +475,34 @@ public class XUtil {
         return true;
     }
 
-    public static boolean copyFileTo(InputStream inputStream, File destFile)
-            throws IOException {
-        if (inputStream == null || destFile == null) {
-            return false;
-        }
-        if (destFile.isDirectory())
-            return false;
+    public static void contentToTxt(String filePath, String content) {
+        String str = new String(); //原有txt内容
+        String s1 = new String();//内容更新
+        try {
+            File f = new File(filePath);
+//            if (f.exists()) {
+//                System.out.print("文件存在");
+//            } else {
+//                System.out.print("文件不存在");
+//                f.createNewFile();// 不存在则创建
+//            }
+            createFile(filePath);
+            BufferedReader input = new BufferedReader(new FileReader(f));
+            while ((str = input.readLine()) != null) {
+                s1 += str + "\n";
+            }
+            System.out.println(s1);
+            input.close();
+            s1 += content;
+            BufferedWriter output = new BufferedWriter(new FileWriter(f));
+            output.write(s1);
+            output.close();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-        if (!destFile.exists()) {
-            createFile(destFile.getAbsolutePath());
         }
-        FileOutputStream fos = new FileOutputStream(destFile);
-        int readLen = 0;
-        byte[] buf = new byte[1024];
-        while ((readLen = inputStream.read(buf)) != -1) {
-            fos.write(buf, 0, readLen);
-        }
-        fos.flush();
-        fos.close();
-        inputStream.close();
-        return true;
     }
+
 
     public static String getPathFromUri(Context context, Uri uri) {
         String path = "";

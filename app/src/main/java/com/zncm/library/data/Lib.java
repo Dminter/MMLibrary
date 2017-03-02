@@ -21,7 +21,7 @@ public class Lib extends BaseData {
     @DatabaseField
     private int lib_exi1 = 0; //type user 0,sys 1,rss 2
     @DatabaseField
-    private int lib_exi2;
+    private int lib_exi2;//[page]
     @DatabaseField
     private int lib_exi3;
     @DatabaseField
@@ -44,7 +44,7 @@ public class Lib extends BaseData {
     @DatabaseField
     private boolean lib_exb1;//是否内置库-不可修改
     @DatabaseField
-    private boolean lib_exb2;
+    private boolean lib_exb2; //是否网页详情页
     @DatabaseField
     private boolean lib_exb3;
     @DatabaseField
@@ -55,7 +55,7 @@ public class Lib extends BaseData {
 
     public enum libType {
         //user 0,sys 1,rss 2
-        user(0, "user"), sys(1, "sys"), rss(2, "rss"), net(3, "net");
+        user(0, "user"), sys(1, "sys"), rss(2, "rss"), net(3, "net"), api(4, "api");
 
         private String strName;
         private int value;
@@ -93,7 +93,8 @@ public class Lib extends BaseData {
         this.lib_modify_time = System.currentTimeMillis();
         this.lib_exb1 = lib_exb1;
     }
-    public Lib(String lib_name,String lib_exs1, int lib_exi1) {
+
+    public Lib(String lib_name, String lib_exs1, int lib_exi1) {
         this.lib_name = lib_name;
         this.lib_time = System.currentTimeMillis();
         this.lib_modify_time = System.currentTimeMillis();

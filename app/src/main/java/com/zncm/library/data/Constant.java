@@ -30,6 +30,10 @@ public class Constant {
     public static String SHARE_URL = "http://fir.im/lib/";
     public static String QQ_LIB_SHARE = "1603638739";
 
+    public static String PRE_LIB = "@N";
+    public static String NET_DIV = "@";
+
+
     public static String SYS_SHARE = "分享";
     public static String SYS_CLIPBOARD = "剪贴板";
     public static String SYS_NOTIFY = "通知栏";
@@ -43,6 +47,7 @@ public class Constant {
     public static String SYS_HONGBAO = "红包";
     public static String SYS_FILE_DOWNLOAD = "文件下载";
     public static String SYS_COLLECT = "网页收藏";
+    public static String SYS_NET_TEXT = "网页正文";
     public static String SYS_NET_HISTORY = "网页历史";
     public static String SYS_PICS = "网页图片";
     public static String SYS_SYS_MK = "标题:文本||内容:文本||时间:文本";
@@ -79,6 +84,11 @@ public class Constant {
     public static String SYS_PRE_ITEM = "SYS_PRE_ITEM";
 
     public static String SYS_RSS_MK = "标题:文本||时间:文本||来源:文本";
+
+
+    public static String SYS_QR = "二维码";
+    public static String SYS_QR_MK = "扫描结果:文本||时间:文本";
+//    public static String SYS_NET_MK = "标题:文本||时间:文本||来源:文本";
 
 
 }

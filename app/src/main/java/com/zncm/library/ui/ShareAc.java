@@ -51,7 +51,7 @@ public class ShareAc extends BaseAc {
                 if (!XUtil.notEmptyOrNull(content)) {
                     return;
                 }
-
+                XUtil.tShort("已保存~ " + content);
                 initSave(Constant.SYS_SHARE, content, "");
                 finish();
 
@@ -75,6 +75,13 @@ public class ShareAc extends BaseAc {
         }
     }
 
+    public static void initLibNet(String libName, String libDesc) {
+        LocLibFt.mkLib(libName, libDesc, libName + ":文本||" + libDesc + ":文本", Lib.libType.net.value());
+    }
+
+    public static void initLibApi(String libName, String libDesc) {
+        LocLibFt.mkLib(libName, libDesc, libName + ":文本||" + libDesc + ":文本", Lib.libType.api.value());
+    }
 
     public static boolean initSaveList(String libName, String mk, ArrayList<String> list) {
         return initSaveList(libName, mk, list, Lib.libType.net.value());
@@ -103,25 +110,43 @@ public class ShareAc extends BaseAc {
     }
 
     public static void saveDataList(int libId, ArrayList<String> list) {
+        saveDataList(libId, list, null);
+    }
+
+    public static void saveDataList(int libId, ArrayList<String> list, Items items) {
         if (!XUtil.listNotNull(list)) {
             return;
         }
         Lib lib = Dbutils.getLibById(libId);
-        saveInfo(list, lib);
+        saveInfo(list, lib, items);
     }
 
     private static void saveInfo(ArrayList<String> list, Lib lib) {
+        saveInfo(list, lib, null);
+    }
+
+    private static void saveInfo(ArrayList<String> list, Lib lib, Items items) {
         try {
             if (lib != null) {
                 List<Fields> datas = Dbutils.getFields(lib.getLib_id());
                 Map<String, Object> map = new HashMap<>();
                 if (XUtil.listNotNull(datas)) {
+
+                    Items tmp = new Items();
+                    if (items != null) {
+                        tmp = items;
+                    }
+
                     int max = Math.min(datas.size(), list.size());
                     for (int i = 0; i < max; i++) {
                         map.put(datas.get(i).getFields_id() + "", list.get(i));
                     }
                     JSON json = new JSONObject(map);
-                    Dbutils.addItems(new Items(lib.getLib_id(), json.toJSONString()));
+                    tmp.setLib_id(lib.getLib_id());
+                    tmp.setItem_json(json.toJSONString());
+                    tmp.setItem_time(System.currentTimeMillis());
+                    tmp.setItem_modify_time(System.currentTimeMillis());
+                    Dbutils.addItems(tmp);
                 }
             }
         } catch (Exception e) {

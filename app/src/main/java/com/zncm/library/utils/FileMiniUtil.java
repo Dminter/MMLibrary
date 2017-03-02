@@ -177,6 +177,27 @@ public class FileMiniUtil {
         return intent;
     }
 
+    public static String formatFileSize(String kbStr) {
+        if (XUtil.notEmptyOrNull(kbStr)) {
+            return "0KB";
+        } else {
+            long SIZE_KB = 1024L;
+            long SIZE_MB = SIZE_KB * 1024L;
+            long SIZE_GB = SIZE_MB * 1024L;
+            float size = 0.0F;
+
+            try {
+                size = Float.parseFloat(kbStr);
+            } catch (NumberFormatException var9) {
+                var9.printStackTrace();
+                return "";
+            }
+
+            size *= (float) SIZE_KB;
+            return size < (float) SIZE_KB ? String.format("%d B", new Object[]{Integer.valueOf((int) size)}) : (size < (float) SIZE_MB ? String.format("%.2f KB", new Object[]{Float.valueOf(size / (float) SIZE_KB)}) : (size < (float) SIZE_GB ? String.format("%.2f MB", new Object[]{Float.valueOf(size / (float) SIZE_MB)}) : String.format("%.2f GB", new Object[]{Float.valueOf(size / (float) SIZE_GB)})));
+        }
+    }
+
     // Android获取一个用于打开CHM文件的intent
     public static Intent getChmFileIntent(String param) {
 

@@ -11,15 +11,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.astuetz.PagerSlidingTabStrip;
 import com.malinskiy.materialicons.Iconify;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zncm.library.R;
+import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.ft.LibFt;
+import com.zncm.library.ft.LocLibFt;
 import com.zncm.library.utils.XUtil;
+
+import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 
@@ -29,8 +35,9 @@ public class TabMyLibActivity extends BaseAc {
     private LibFt libSysFt;
     private LibFt libRssFt;
     private LibFt libNetFt;
+    private LibFt libApiFt;
     private ViewPager mViewPager;
-    private String TITLES[] = new String[]{"我的库", "系统库", "RSS", "网络库"};
+    private String TITLES[] = new String[]{"我的库", "系统库", "RSS", "网络库", "API"};
     MaterialSearchView searchView;
 
     Context ctx;
@@ -137,6 +144,14 @@ public class TabMyLibActivity extends BaseAc {
                     libNetFt.setArguments(bundle);
                     fragment = libNetFt;
                     break;
+
+                case 4:
+                    libApiFt = new LibFt();
+                    bundle = new Bundle();
+                    bundle.putInt("libType", Lib.libType.api.value());
+                    libApiFt.setArguments(bundle);
+                    fragment = libApiFt;
+                    break;
             }
 
             return fragment;
@@ -171,6 +186,7 @@ public class TabMyLibActivity extends BaseAc {
         sub.add(0, 1, 0, "设置");
         sub.add(0, 2, 0, "模板");
         sub.add(0, 3, 0, "浏览器");
+        sub.add(0, 4, 0, "扫一扫");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
@@ -213,7 +229,8 @@ public class TabMyLibActivity extends BaseAc {
                 startActivity(intent);
                 break;
             case 4:
-
+                intent = new Intent(this, QRActivity.class);
+                startActivityForResult(intent, 1111);
                 break;
 
             case 5:
@@ -227,4 +244,83 @@ public class TabMyLibActivity extends BaseAc {
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        /**
+         * 处理二维码扫描结果
+         */
+        if (requestCode == 1111) {
+            //处理扫描结果（在界面上显示）
+            if (null != data) {
+                Bundle bundle = data.getExtras();
+                if (bundle == null) {
+                    return;
+                }
+                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                    String result = bundle.getString(CodeUtils.RESULT_STRING);
+                    qrSuccess(ctx, result);
+                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                    qrFailed();
+                }
+            }
+        }
+    }
+
+    public static void qrFailed() {
+        XUtil.tShort("解析二维码失败");
+    }
+
+    public static void qrSuccess(final Context ctx, final String result) {
+        if (XUtil.isEmptyOrNull(result)) {
+            return;
+        }
+//                    Toast.makeText(this, "解析结果:" + result, Toast.LENGTH_LONG).show();
+        ArrayList<String> strs = new ArrayList<>();
+        if (XUtil.notEmptyOrNull(result)) {
+            strs.add(result);
+            strs.add(XUtil.getDateFullSec());
+        }
+        ShareAc.initSaveList(Constant.SYS_QR, Constant.SYS_QR_MK, strs, Lib.libType.sys.value());
+        XUtil.tShort(result);
+
+        if (result.startsWith("http") || result.startsWith("www")) {
+            Intent intent = new Intent(ctx, WebViewActivity.class);
+            intent.putExtra("url", result);
+            ctx.startActivity(intent);
+        } else if (result.contains("|||")) {
+
+
+            new MaterialDialog.Builder(ctx)
+                    .title("导入库")
+                    .content("结构:" + result)
+                    .positiveText("导入")
+                    .negativeText("取消")
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            String content = result.replaceAll("，", ",").replaceAll("：", ":");
+                            String arr[] = content.split("\\|\\|\\|");
+                            if (arr.length > 1) {
+                                LocLibFt.mkLib(arr[0], arr[1]);
+                            }
+                        }
+
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            super.onNegative(dialog);
+                            showInfo(ctx, result);
+                        }
+                    }).show();
+        } else {
+            showInfo(ctx, result);
+        }
+    }
+
+    private static void showInfo(Context ctx, String result) {
+        Intent newIntent = new Intent(ctx, ShowInfoActivity.class);
+        newIntent.putExtra("show", result);
+        ctx.startActivity(newIntent);
+    }
 }

@@ -22,6 +22,7 @@ import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Fields;
 import com.zncm.library.data.Lib;
@@ -229,6 +230,17 @@ public class LocLibFt extends BaseListFt {
 
     public static void mkLib(String name, String libDesc, String content, int libType) {
         try {
+
+
+            if (content.contains("http://")) {
+                content = content.replaceAll("http://", "http@//");
+            }
+
+
+            if (content.contains("https://")) {
+                content = content.replaceAll("https://", "https@//");
+            }
+//
             String arr[] = content.split("\\|\\|");
             if (arr.length > 0) {
                 int lib_id = Dbutils.addLib(new Lib(name, libDesc, libType));
@@ -243,6 +255,9 @@ public class LocLibFt extends BaseListFt {
                             String fields[] = value.split(":");
                             if (fields.length > 1) {
                                 fields_content = fields[0];
+                                if (fields_content.contains(Constant.NET_DIV)) {
+                                    fields_content = fields_content.replace(Constant.NET_DIV, ":");
+                                }
                                 fields_type_str = fields[1];
                                 if (XUtil.notEmptyOrNull(fields_type_str)) {
                                     if (fields_type_str.contains(EnumData.FieldsTypeEnum.FIELDS_OPTIONS_ONE.getStrName()) || fields_type_str.contains(EnumData.FieldsTypeEnum.FIELDS_OPTIONS_MANY.getStrName())) {
