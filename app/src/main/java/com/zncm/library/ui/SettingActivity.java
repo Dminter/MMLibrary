@@ -221,7 +221,9 @@ public class SettingActivity extends MaterialSettings {
             }
         }));
 
-        addItem(new TextItem(ctx, "").setTitle("检查更新").setSubtitle("当前版本:" + XUtil.getVersionName(ctx) + "(Build " + XUtil.getVersionCode(ctx) + ")").setOnclick(new TextItem.OnClickListener() {
+        String buildDate = "2017-4-9 18:31:42";
+
+        addItem(new TextItem(ctx, "").setTitle("检查更新").setSubtitle("当前版本:" + XUtil.getVersionName(ctx) + " (Build " + XUtil.getVersionCode(ctx) + ") @" + buildDate).setOnclick(new TextItem.OnClickListener() {
             @Override
             public void onClick(TextItem textItem) {
                 Intent intent = new Intent(ctx, WebViewActivity.class);

@@ -10,8 +10,8 @@ android {
         applicationId "com.zncm.library"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 14
-        versionName "0.1.4"
+        versionCode 15
+        versionName "0.1.5"
     }
     buildTypes {
         release {
