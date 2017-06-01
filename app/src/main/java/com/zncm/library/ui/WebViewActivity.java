@@ -95,8 +95,6 @@ public class WebViewActivity extends BaseAc {
         ctx = this;
         url = getIntent().getExtras().getString("url");
         isImport = getIntent().getExtras().getBoolean("isImport", false);
-
-
         mWebView = (WebView) findViewById(R.id.mWebView);
         mWebView.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, final String url) {

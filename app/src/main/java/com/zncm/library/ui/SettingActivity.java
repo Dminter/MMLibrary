@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -231,7 +232,6 @@ public class SettingActivity extends MaterialSettings {
                 startActivity(intent);
             }
         }));
-
 
         addItem(new TextItem(ctx, "").setTitle("交流反馈").setSubtitle("开发者微信: xm0ff255").setOnclick(new TextItem.OnClickListener() {
             @Override

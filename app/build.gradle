@@ -9,9 +9,9 @@ android {
     defaultConfig {
         applicationId "com.zncm.library"
         minSdkVersion 15
-        targetSdkVersion 21
-        versionCode 15
-        versionName "0.1.5"
+        targetSdkVersion 25
+        versionCode 16
+        versionName "0.1.6"
     }
     buildTypes {
         release {
