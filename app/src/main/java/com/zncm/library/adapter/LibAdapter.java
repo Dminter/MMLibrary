@@ -66,6 +66,7 @@ public abstract class LibAdapter extends BaseAdapter {
             holder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
             holder.ivIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
             holder.tvContent = (TextView) convertView.findViewById(R.id.tvContent);
+            holder.tvIcon = (ImageView) convertView.findViewById(R.id.tvIcon);
             holder.operate = (IconTextView) convertView.findViewById(R.id.operate);
             holder.btn = (Button) convertView.findViewById(R.id.btn);
             holder.rlBg = (RelativeLayout) convertView.findViewById(R.id.rlBg);
@@ -83,6 +84,7 @@ public abstract class LibAdapter extends BaseAdapter {
     public class MyViewHolder {
         public TextView tvTitle;
         public TextView tvContent;
+        public ImageView tvIcon;
         public ImageView ivIcon;
         public IconTextView operate;
         public RelativeLayout rlBg;

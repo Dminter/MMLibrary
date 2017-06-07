@@ -46,6 +46,8 @@
         </FrameLayout>
 
 
+
+
         <ImageView
             android:id="@+id/ivIcon"
             android:layout_width="48dp"
@@ -53,7 +55,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_lib"
             android:visibility="gone" />
 
@@ -67,11 +69,27 @@
             android:gravity="center"
             android:orientation="vertical">
 
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+            <ImageView
+                    android:id="@+id/tvIcon"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:visibility="gone"
+                    android:layout_marginRight="3dp"
+                    android:src="@drawable/ic_recd_round" />
+
             <TextView
                 android:id="@+id/tvTitle"
                 style="@style/mText"
                 android:singleLine="true"
                 android:text="11111111111" />
+        </LinearLayout>
 
             <TextView
                 android:id="@+id/tvContent"
@@ -81,6 +99,10 @@
                 android:textColor="@color/gray"
                 android:textSize="14sp" />
         </LinearLayout>
+
+
+
+
 
 
     </RelativeLayout>

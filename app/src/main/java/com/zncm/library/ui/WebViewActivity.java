@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SubMenu;
+import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -43,6 +47,7 @@ import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.NotiHelper;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
+import com.zncm.library.view.ItemLongClickedPopWindow;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -75,7 +80,11 @@ public class WebViewActivity extends BaseAc {
 
     Set<String> urlSet = new HashSet<>();
     ArrayList<String> urls = new ArrayList<>();
+    private GestureDetector gestureDetector;
+    private int downX, downY;
 
+
+    String imgurl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +190,108 @@ public class WebViewActivity extends BaseAc {
 
             }
         });
+
+
+
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public void onLongPress(MotionEvent e) {
+                downX = (int) e.getX();
+                downY = (int) e.getY();
+            }
+        });
+        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                WebView.HitTestResult result = ((WebView) v).getHitTestResult();
+                if (WebView.HitTestResult.IMAGE_TYPE==result.getType()){
+                    if (XUtil.notEmptyOrNull(result.getExtra())){
+                        Intent intent = new Intent(ctx, PhotoAc.class);
+                        intent.putExtra("url", result.getExtra());
+                        startActivity(intent);
+                    }
+                }
+                return true;
+            }
+        });
+//        mWebView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                WebView.HitTestResult result = ((WebView) v).getHitTestResult();
+//                if (WebView.HitTestResult.IMAGE_TYPE==result.getType()){
+//                    if (XUtil.notEmptyOrNull(result.getExtra())){
+//                        Intent intent = new Intent(ctx, PhotoAc.class);
+//                        intent.putExtra("url", result.getExtra());
+//                        startActivity(intent);
+//                    }
+//                }
+//
+//            }
+//        });
+//        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//
+//                XUtil.debug("长按了webview");
+//
+//
+//                WebView.HitTestResult result = ((WebView) v).getHitTestResult();
+//
+//
+//                /**
+//                 *WebView.HitTestResult.UNKNOWN_TYPE    未知类型
+//                 WebView.HitTestResult.PHONE_TYPE    电话类型
+//                 WebView.HitTestResult.EMAIL_TYPE    电子邮件类型
+//                 WebView.HitTestResult.GEO_TYPE    地图类型
+//                 WebView.HitTestResult.SRC_ANCHOR_TYPE    超链接类型
+//                 WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE    带有链接的图片类型
+//                 WebView.HitTestResult.IMAGE_TYPE    单纯的图片类型
+//                 WebView.HitTestResult.EDIT_TEXT_TYPE    选中的文字类型
+//                 */
+//
+//
+//                if (null == result)
+//                    return false;
+//                int type = result.getType();
+//                if (type == WebView.HitTestResult.UNKNOWN_TYPE)
+//                    return false;
+//                if (type == WebView.HitTestResult.EDIT_TEXT_TYPE) {
+//                    //let TextViewhandles context menu return true;
+//                }
+//                final ItemLongClickedPopWindow itemLongClickedPopWindow = new ItemLongClickedPopWindow(WebViewActivity.this, ItemLongClickedPopWindow.IMAGE_VIEW_POPUPWINDOW, XUtil.dip2px(120), XUtil.dip2px(90));
+//                // Setup custom handlingdepending on the type
+//                switch (type) {
+//                    case WebView.HitTestResult.PHONE_TYPE: // 处理拨号
+//                        break;
+//                    case WebView.HitTestResult.EMAIL_TYPE: // 处理Email
+//                        break;
+//                    case WebView.HitTestResult.GEO_TYPE: // TODO
+//                        break;
+//                    case WebView.HitTestResult.SRC_ANCHOR_TYPE: // 超链接
+//                        // Log.d(DEG_TAG, "超链接");
+//                        break;
+//                    case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+//                        break;
+//                    case WebView.HitTestResult.IMAGE_TYPE: // 处理长按图片的菜单项
+//                        imgurl = result.getExtra();
+//                        //通过GestureDetector获取按下的位置，来定位PopWindow显示的位置
+////                        itemLongClickedPopWindow.showAtLocation(v, Gravity.TOP | Gravity.LEFT, (int) v.getX()+ 10, (int) v.getY() + 10);
+//
+//                        if (XUtil.notEmptyOrNull(imgurl)){
+//                            Intent intent = new Intent(ctx, PhotoAc.class);
+//                            intent.putExtra("url", imgurl);
+//                            startActivity(intent);
+//                        }
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+
+
+
         searchView = (MaterialSearchView) ctx.findViewById(R.id.search_view);
         searchView.setHint("搜索");
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {

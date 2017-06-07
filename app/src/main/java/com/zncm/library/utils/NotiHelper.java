@@ -11,6 +11,8 @@ import android.support.v7.app.NotificationCompat;
 import com.zncm.library.R;
 import com.zncm.library.data.MyApplication;
 
+import java.util.Random;
+
 /**
  * Created by jmx on 12/17 0017.
  */
@@ -37,7 +39,7 @@ public class NotiHelper {
 
 
     public static PendingIntent getDefalutIntent(Context ctx, Intent intent, int flags) {
-        PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 1, intent, flags);
+        PendingIntent pendingIntent = PendingIntent.getActivity(ctx, new Random().nextInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return pendingIntent;
     }
 }

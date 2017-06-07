@@ -474,7 +474,7 @@ public class ApiUrils {
                         } else {
                             myQueue.removeAll(myQueue);
                         }
-                        Document doc = Jsoup.connect(url).timeout(3000).get();
+                        Document doc = Jsoup.connect(url).header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0").timeout(3000).get();
 //                        XUtil.debug("doc==>>"+doc.outerHtml());
                         ArrayList<String> dlist = new ArrayList<String>();
                         for (Integer in : map.keySet()) {
@@ -548,7 +548,16 @@ public class ApiUrils {
                                         String srcStr = element.attr("src");
                                         list.add(srcStr);
                                     } else {
-                                        list.add(element.text());
+
+                                        /**
+                                         * 小于10个字符且li的舍弃
+                                         */
+                                        if (element.text().length()<10&&XUtil.notEmptyOrNull(elementsKey)&&elementsKey.equals("li")){
+
+                                        }else {
+                                            list.add(element.text());
+                                        }
+
                                     }
 //                                    XUtil.debug("---->>>" + element.text() + "  --- " + list);
 //                                    _durl = "http://www.topit.me/tag/%E5%A3%81%E7%BA%B8?p=" + new Random().nextInt();

@@ -15,7 +15,9 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.text.ClipboardManager;
+import android.text.Html;
 import android.text.Spannable;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
@@ -313,10 +315,23 @@ public class XUtil {
         content = content.replaceAll("<p .*?>", "/r/n");
         // <br><br/>替换为换行
         content = content.replaceAll("<br//s*/?>", "/r/n");
-        // 去掉其它的<>之间的东西
+        // 去掉其它的<>之间的东西 \u00A0
         content = content.replaceAll("//<.*?>", "");
         return content;
     }
+
+
+    public static Spanned fromHtml(String content) {
+        if (isEmptyOrNull(content)) {
+            return null;
+        }
+        content = content.replaceAll("\\\\u00A0", "");
+        content = content.trim();
+        Spanned  contentHtml  = Html.fromHtml(content);
+        XUtil.debug("===>>>"+contentHtml);
+        return contentHtml;
+    }
+
 
     public static void stripUnderlinesEditText(EditText editText) {
         if (null != editText && editText.getText() instanceof Spannable) {

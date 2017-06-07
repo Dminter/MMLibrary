@@ -157,10 +157,15 @@ public class ItemsFt extends BaseListFt {
 
 
                 if (data.isItem_exb1()) {
-                    holder.rlBg.setBackgroundResource(R.drawable.card_dark);
+                    holder.tvIcon.setVisibility(View.GONE);
                 } else {
-                    holder.rlBg.setBackgroundResource(R.drawable.card);
+                    holder.tvIcon.setVisibility(View.VISIBLE);
                 }
+//                if (data.isItem_exb1()) {
+//                    holder.rlBg.setBackgroundResource(R.drawable.card_dark);
+//                } else {
+//                    holder.rlBg.setBackgroundResource(R.drawable.card);
+//                }
 
                 if (XUtil.notEmptyOrNull(data.getItem_json())) {
                     Map<String, Object> map = new HashMap<>();
@@ -300,6 +305,10 @@ public class ItemsFt extends BaseListFt {
                                                             intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img"));
                                                             startActivity(intent);
                                                         } else {
+                                                            /**
+                                                             *已读
+                                                             */
+                                                            Dbutils.readItems(tmp.getItem_id(), true);
                                                             Intent intent = new Intent(ctx, WebViewActivity.class);
                                                             intent.putExtra("url", tmp.getItem_exs1());
                                                             startActivity(intent);

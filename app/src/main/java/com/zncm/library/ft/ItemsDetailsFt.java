@@ -1,12 +1,12 @@
 package com.zncm.library.ft;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Html;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -129,6 +129,8 @@ public class ItemsDetailsFt extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
+
+
                 current = position;
                 if (!bSearch && current == itemsList.size() - 1) {
                     size += Constant.MAX_DB_QUERY;
@@ -139,7 +141,7 @@ public class ItemsDetailsFt extends Fragment {
                         mAdapter.setItems(itemsList);
                     }
                 }
-                ctx.myTitle(title + "  " + (position + 1) + "/" + totalSize);
+                ctx.myTitle((position + 1) + "/" + totalSize);
             }
 
             @Override
@@ -148,7 +150,7 @@ public class ItemsDetailsFt extends Fragment {
             }
         });
         mViewPager.setCurrentItem(current);
-        ctx.myTitle(title + "  " + (current + 1) + "/" + totalSize);
+        ctx.myTitle((current + 1) + "/" + totalSize);
         return mViewPager;
     }
 
@@ -178,7 +180,12 @@ public class ItemsDetailsFt extends Fragment {
         @Override
         public View instantiateItem(ViewGroup container, int position) {
             items = itemsList.get(position);
-            Dbutils.readItems(items.getItem_id(), true);
+            /**
+             *已读
+             */
+            if (XUtil.listNotNull(itemsList)) {
+                Dbutils.readItems(itemsList.get(mViewPager.getCurrentItem()).getItem_id(), true);
+            }
             map = JSON.parseObject(items.getItem_json());
             ScrollView scrollView = initViews();
             container.addView(scrollView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -222,7 +229,7 @@ public class ItemsDetailsFt extends Fragment {
                     final ImageView imageView = new ImageView(ctx);
                     imageView.setTag(tmp.getFields_id());
                     imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    imageView.setScaleType(ImageView.ScaleType.MATRIX);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     images.add(url);
                     MyApplication.imageLoader.displayImage(url,
                             imageView, new SimpleImageLoadingListener() {
@@ -264,9 +271,10 @@ public class ItemsDetailsFt extends Fragment {
                         String content = ((String) object).trim();
                         if (lib.getLib_exi1() == Lib.libType.rss.value()) {
                             content = XUtil.replaceImageURLs(content);
-                            editText.setText(Html.fromHtml(content));
+                            editText.setText(XUtil.fromHtml(content));
                         } else {
-                            editText.setText(Html.fromHtml(content));
+                            editText.setText(XUtil.fromHtml(content));
+
 //                            editText.setText(content);
                         }
                         editText.setLineSpacing(1.1f, 1.1f);
@@ -502,12 +510,16 @@ public class ItemsDetailsFt extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
+        menu.add("md_star").setIcon(XUtil.initIconWhite(Iconify.IconValue.md_star)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add("md_notifications").setIcon(XUtil.initIconWhite(Iconify.IconValue.md_notifications)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
         SubMenu sub = menu.addSubMenu("");
         sub.setIcon(XUtil.initIconWhite(Iconify.IconValue.md_more_vert));
         sub.add(0, 1, 0, "编辑");
         sub.add(0, 2, 0, "分享");
-        sub.add(0, 3, 0, "收藏");
-        sub.add(0, 4, 0, "贴到通知栏");
+//        sub.add(0, 3, 0, "收藏");
+//        sub.add(0, 4, 0, "贴到通知栏");
         sub.add(0, 5, 0, "删除");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -522,6 +534,14 @@ public class ItemsDetailsFt extends Fragment {
             return false;
         }
 
+
+        if (item.getTitle().equals("md_star")) {
+            infoSc();
+        } else if (item.getTitle().equals("md_notifications")) {
+            infoNoti();
+        }
+
+
         switch (item.getItemId()) {
             case 1:
                 Intent intent = new Intent(ctx, ItemsAddAc.class);
@@ -534,10 +554,10 @@ public class ItemsDetailsFt extends Fragment {
                 infoShare();
                 break;
             case 3:
-                infoSc();
+
                 break;
             case 4:
-                infoNoti();
+
                 break;
             case 5:
                 delDlg();
@@ -616,6 +636,7 @@ public class ItemsDetailsFt extends Fragment {
                 content = strs.get(0);
             }
         }
+
         NotiHelper.noti(title, content, title, intent, false, new Random().nextInt());
 //        NotiHelper.noti(title, content, title, intent, false, items.getItem_id());
         XUtil.tShort("已贴到通知栏");

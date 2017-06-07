@@ -34,7 +34,6 @@
             android:theme="@style/MyMaterialSettings"></activity>
         <activity
             android:name=".ui.ItemsDetailsAc"
-            android:launchMode="singleTop"
             android:theme="@style/MainTheme" />
         <activity android:name=".ui.ShowInfoActivity" />
         <activity android:name=".ui.LikeActivity" />
@@ -63,9 +62,7 @@
             android:theme="@style/MainTheme">
             <intent-filter android:label="发送到我的库">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="image/*" />
                 <data android:mimeType="text/*" />
                 <data android:mimeType="application/csv" />
