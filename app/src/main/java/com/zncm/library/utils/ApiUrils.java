@@ -544,24 +544,29 @@ public class ApiUrils {
 //                                    }
 
 
-                                    if (XUtil.isEmptyOrNull(element.text())) {
-                                        String srcStr = element.attr("src");
-                                        list.add(srcStr);
-                                    } else {
+//                                    if (XUtil.isEmptyOrNull(element.text())) {
+//                                        String srcStr = element.attr("src");
+//                                        list.add(srcStr);
+//                                    } else {
+//
+//
+//
+//                                    }
 
-                                        /**
-                                         * 小于10个字符且li的舍弃
-                                         */
-                                        if (element.text().length()<10&&XUtil.notEmptyOrNull(elementsKey)&&elementsKey.equals("li")){
 
-                                        }else {
-                                            list.add(element.text());
-                                        }
+                                    /**
+                                     * 小于10个字符且li的舍弃
+                                     */
+                                    if (element.text().length()<20&&XUtil.notEmptyOrNull(elementsKey)&&elementsKey.equals("li")){
 
+                                    }else {
+                                        list.add(element.text());
+                                        dlist.add(_durl);
                                     }
+
 //                                    XUtil.debug("---->>>" + element.text() + "  --- " + list);
 //                                    _durl = "http://www.topit.me/tag/%E5%A3%81%E7%BA%B8?p=" + new Random().nextInt();
-                                    dlist.add(_durl);
+
 //                                    XUtil.debug("  " + element.html() + "-- " + _durl);
                                 }
                             } else {

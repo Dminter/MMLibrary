@@ -1,19 +1,14 @@
 package com.zncm.library.ft;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,16 +17,12 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.asm.Type;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.android.volley.Request;
@@ -45,12 +36,10 @@ import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.utils.L;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
-import com.zncm.library.data.ApiData.Feed;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.DetailInfo;
 import com.zncm.library.data.EnumData;
@@ -64,17 +53,14 @@ import com.zncm.library.data.SpConstant;
 import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
-import com.zncm.library.ui.LibAc;
 import com.zncm.library.ui.LibAddAc;
 import com.zncm.library.ui.LikeActivity;
-import com.zncm.library.ui.LocLibAc;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.WebViewActivity;
 import com.zncm.library.utils.ApiUrils;
 import com.zncm.library.utils.CSVUtils;
 import com.zncm.library.utils.Dbutils;
-import com.zncm.library.utils.DoubleClickImp;
 import com.zncm.library.utils.ImageUtil;
 import com.zncm.library.utils.MyPath;
 import com.zncm.library.utils.MySp;
@@ -84,25 +70,16 @@ import com.zncm.library.utils.saxrssreader.RssFeed;
 import com.zncm.library.utils.saxrssreader.RssItem;
 import com.zncm.library.utils.saxrssreader.RssReader;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import de.greenrobot.event.EventBus;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
 
-import de.greenrobot.event.EventBus;
 import tr.xip.errorview.RetryListener;
 
 
@@ -573,12 +550,9 @@ public class ItemsFt extends BaseListFt {
 
                         XUtil.debug("ret::" + ret);
 
-                        org.json.JSONObject obj = new org.json.JSONObject(ret);
-
+                        String item = "";
 
                         String _url = "";
-                        String _link = "";
-
                         Map<Integer, String> map = new HashMap<Integer, String>();
                         Map<Integer, ArrayList<String>> mapOut = new HashMap<Integer, ArrayList<String>>();
                         for (int i = 0; i < datas.size(); i++) {
@@ -596,25 +570,31 @@ public class ItemsFt extends BaseListFt {
                                 XUtil.debug("name===>>" + name);
                             }
                         }
-
-                        if (XUtil.isEmptyOrNull(_url)) {
-                            return;
-                        }
-                        String item = "";
-                        if (_url.contains("/")) {
-                            String arr[] = _url.split("\\/");
-                            if (arr.length == 5) {
-                                item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getJSONObject(arr[3]).getString(arr[4]);
-                            } else if (arr.length == 4) {
-                                item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getString(arr[3]);
-                            } else if (arr.length == 3) {
-                                item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getString(arr[2]);
-                            } else if (arr.length == 2) {
-                                item = obj.getJSONObject(arr[0]).getString(arr[1]);
+                        try {
+                            org.json.JSONObject obj = new org.json.JSONObject(ret);
+                            String _link = "";
+                            if (XUtil.isEmptyOrNull(_url)) {
+                                return;
                             }
 
-                        } else {
-                            item = obj.getString(_url);
+                            if (_url.contains("/")) {
+                                String arr[] = _url.split("\\/");
+                                if (arr.length == 5) {
+                                    item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getJSONObject(arr[3]).getString(arr[4]);
+                                } else if (arr.length == 4) {
+                                    item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getString(arr[3]);
+                                } else if (arr.length == 3) {
+                                    item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getString(arr[2]);
+                                } else if (arr.length == 2) {
+                                    item = obj.getJSONObject(arr[0]).getString(arr[1]);
+                                }
+
+                            } else {
+                                item = obj.getString(_url);
+                            }
+                        } catch (Exception e) {
+                            item = ret;
+                            e.printStackTrace();
                         }
 
 
@@ -638,7 +618,26 @@ public class ItemsFt extends BaseListFt {
                                     value = value.substring(1);
                                     isUrl = true;
                                 }
+
+
+                                String urlPre = "";
+                                boolean isUrlStr = false;
+                                if (XUtil.notEmptyOrNull(value) && value.contains("{")&& value.contains("}")) {
+                                    /**
+                                     *匹配整个网址串  https://xxx.com/thread?id={}
+                                     */
+                                    isUrlStr = true;
+                                    urlPre = value;
+                                    value = urlPre.substring(urlPre.indexOf("{")+1,urlPre.indexOf("}"));
+                                    XUtil.debug("isUrlStr-value::"+value);
+                                }
+
                                 String tmp = list1.getJSONObject(i).get(value) + "";
+
+                                if (isUrlStr&&XUtil.notEmptyOrNull(urlPre)&XUtil.notEmptyOrNull(tmp) ){
+                                    tmp = urlPre.replace("{"+value+"}",tmp);
+                                }
+
                                 if (isUrl) {
                                     link = tmp;
                                 } else {
@@ -759,6 +758,7 @@ public class ItemsFt extends BaseListFt {
         sub.add(0, 3, 0, "导出CSV");
         sub.add(0, 4, 0, "分享库结构");
         sub.add(0, 5, 0, "复制库结构");
+        sub.add(0, 10, 0, "克隆库结构");
         sub.add(0, 6, 0, "发布库");
         sub.add(0, 8, 0, "二维码分享");
         if (isSys) {
@@ -840,8 +840,7 @@ public class ItemsFt extends BaseListFt {
                 searchView.showSearch(true);
                 break;
             case 2:
-                if (lib.getLib_exi1() == Lib.libType.user.value()
-                        || lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value() || lib.getLib_exi1() == Lib.libType.api.value()) {
+                if (lib.getLib_exi1() != Lib.libType.sys.value()) {
                     Intent intent = new Intent(ctx, LibAddAc.class);
                     intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
                     intent.putExtra(Constant.KEY_PARAM_DATA, lib);
@@ -898,6 +897,21 @@ public class ItemsFt extends BaseListFt {
                 lib.setLib_exb2(!lib.isLib_exb2());
                 Dbutils.updateLib(lib);
                 XUtil.tShort("已修改~");
+                break;
+
+            case 10:
+             String   content = libInfo();
+                try {
+                    content = content.replaceAll("，", ",").replaceAll("：", ":");
+                    String arr[] = content.split("\\|\\|\\|");
+                    if (arr.length > 1) {
+//                        lib_exi1
+                        LocLibFt.mkLib(arr[0], arr[1],lib.getLib_exi1());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                XUtil.tLong("库结构已克隆~");
                 break;
         }
 

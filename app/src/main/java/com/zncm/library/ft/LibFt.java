@@ -161,8 +161,7 @@ public class LibFt extends BaseListFt {
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                 switch (which) {
                                     case 0:
-                                        if (data.getLib_exi1() == Lib.libType.user.value()
-                                                || data.getLib_exi1() == Lib.libType.rss.value() || data.getLib_exi1() == Lib.libType.net.value()) {
+                                        if (data.getLib_exi1() != Lib.libType.sys.value()) {
                                             Intent intent = new Intent(ctx, LibAddAc.class);
                                             intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
                                             intent.putExtra(Constant.KEY_PARAM_DATA, data);
