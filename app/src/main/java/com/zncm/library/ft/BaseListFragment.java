@@ -6,6 +6,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
@@ -26,6 +27,7 @@ public abstract class BaseListFragment extends BaseFragment implements SwipeRefr
     protected View view;
     protected FloatingActionButton addButton;
     protected LayoutInflater mInflater;
+    protected LinearLayout headView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public abstract class BaseListFragment extends BaseFragment implements SwipeRefr
         );
         swipeLayout.setBackgroundColor(getResources().getColor(R.color.white));
         listView = (LoadMoreRecyclerView) view.findViewById(R.id.listView);
+        headView = (LinearLayout) view.findViewById(R.id.headView);
         listView.setHasFixedSize(true);
         addButton = (FloatingActionButton) view.findViewById(R.id.button_floating_action);
         addButton.setImageDrawable(XUtil.initIconWhite(Iconify.IconValue.md_add));

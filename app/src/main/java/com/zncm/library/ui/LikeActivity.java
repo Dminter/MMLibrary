@@ -12,7 +12,7 @@ public class LikeActivity extends BaseAc {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        toolbar.setTitle("收藏");
+//        toolbar.setTitle("收藏");
         likeFragment = new LikeFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, likeFragment)

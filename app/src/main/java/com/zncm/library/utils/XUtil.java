@@ -319,7 +319,15 @@ public class XUtil {
         content = content.replaceAll("//<.*?>", "");
         return content;
     }
-
+    public static String getChinese(String paramValue) {
+        String regex = "([\u4e00-\u9fa5]+)";
+        String str = "";
+        Matcher matcher = Pattern.compile(regex).matcher(paramValue);
+        while (matcher.find()) {
+            str+= matcher.group(0);
+        }
+        return str;
+    }
 
     public static Spanned fromHtml(String content) {
         if (isEmptyOrNull(content)) {

@@ -11,9 +11,10 @@ public class DetailInfo extends BaseData {
     public Long time;
 
 
-    public DetailInfo(String url, String key) {
+    public DetailInfo(String url, String key,String title) {
         this.url = url;
         this.key = key;
+        this.title = title;
     }
 
     public String getKey() {

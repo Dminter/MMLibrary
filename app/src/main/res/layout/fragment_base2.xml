@@ -6,39 +6,45 @@
 
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                 xmlns:fab="http://schemas.android.com/apk/res-auto"
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent">
 
 
         <android.support.v4.widget.SwipeRefreshLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/swipeLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-
-            <com.zncm.library.view.loadmore.LoadMoreRecyclerView
-                android:id="@+id/listView"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/swipeLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:divider="@null"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-                android:listSelector="@android:color/transparent"/>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:id="@+id/headView"
+                          android:orientation="vertical"
+                          android:visibility="gone"
+            />
+
+            <com.zncm.library.view.loadmore.LoadMoreRecyclerView
+                    android:id="@+id/listView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:divider="@null"
+
+                    android:listSelector="@android:color/transparent"/>
 
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
 
         <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/button_floating_action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginBottom="110dp"
-            android:layout_marginRight="15dp"
+                android:id="@+id/button_floating_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="110dp"
+                android:layout_marginRight="15dp"
         />
 
     </FrameLayout>

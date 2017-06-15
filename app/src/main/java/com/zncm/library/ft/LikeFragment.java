@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -17,6 +18,7 @@ import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.zncm.library.R;
 import com.zncm.library.adapter.DetailsAdapter;
 import com.zncm.library.data.Constant;
@@ -28,10 +30,14 @@ import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
 import com.zncm.library.data.RefreshEvent;
+import com.zncm.library.data.SpConstant;
+import com.zncm.library.ui.LikeActivity;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.MySp;
+import com.zncm.library.utils.TextExtractor;
 import com.zncm.library.utils.XUtil;
+import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
 import com.zncm.library.view.loadmore.MxItemClickListener;
 
 import org.jsoup.Jsoup;
@@ -52,20 +58,23 @@ import de.greenrobot.event.EventBus;
 
 public class LikeFragment extends BaseListFragment {
     private DetailsAdapter mAdapter;
-    private Activity ctx;
+    private LikeActivity ctx;
     private boolean onLoading = false;
     DetailInfo info;
     ArrayList<Info> list;
-
+    String content ;
+    MaterialEditText editText;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        ctx = (Activity) getActivity();
+        ctx = (LikeActivity) getActivity();
 
         Serializable dataParam = ctx.getIntent().getSerializableExtra(Constant.KEY_PARAM_DATA);
         if (dataParam != null && dataParam instanceof DetailInfo) {
             info = (DetailInfo) dataParam;
         }
+
+        ctx.myTitle(info.getTitle());
 
         addButton.setVisibility(View.GONE);
         mAdapter = new DetailsAdapter(ctx) {
@@ -106,8 +115,36 @@ public class LikeFragment extends BaseListFragment {
 
 
         };
+
+        swipeLayout.setEnabled(false);
         listView.setAdapter(mAdapter);
         getData(true);
+
+
+         editText = new MaterialEditText(ctx);
+//                editText.setAutoLinkMask(Linkify.ALL);
+        if (MySp.get(SpConstant.isShowTitle, Boolean.class, true)) {
+            editText.setFloatingLabelText("信息");
+
+        } else {
+            editText.setHideUnderline(true);
+        }
+        editText.setTextColor(getResources().getColor(R.color.black));
+        editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+        editText.setFloatingLabelAlwaysShown(true);
+        editText.setEnabled(false);
+        editText.setFocusable(false);
+        editText.setPaddings(XUtil.dip2px(10),XUtil.dip2px(10),XUtil.dip2px(10),XUtil.dip2px(10));
+        ScrollView scrollView = new ScrollView(ctx);
+        scrollView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.addView(editText);
+        headView.addView(scrollView);
+        headView.setVisibility(View.VISIBLE);
+
+
+
+
         return view;
     }
 
@@ -123,6 +160,9 @@ public class LikeFragment extends BaseListFragment {
 
             boolean canLoadMore = true;
             try {
+
+                content = ContentExtractor.getContentByURL(info.getUrl());
+//                content = new TextExtractor().extract(info.getUrl());
 
                 Document doc = Jsoup.connect(info.getUrl()).timeout(3000).get();
                 XUtil.debug("getUrl==>>" + info.getUrl());
@@ -188,6 +228,12 @@ public class LikeFragment extends BaseListFragment {
             swipeLayout.setRefreshing(false);
             onLoading = false;
             listView.setCanLoadMore(canLoadMore);
+
+
+            if (XUtil.notEmptyOrNull(content)){
+                editText.setText(content);
+            }
+
         }
     }
 

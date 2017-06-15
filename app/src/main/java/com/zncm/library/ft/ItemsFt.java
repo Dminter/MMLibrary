@@ -38,6 +38,8 @@ import com.nanotasks.Tasks;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
+import com.zf.zson.ZSON;
+import com.zf.zson.result.ZsonResult;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
 import com.zncm.library.data.Constant;
@@ -250,6 +252,9 @@ public class ItemsFt extends BaseListFt {
                                                 int curPosition = position - listView.getHeaderViewsCount();
 
 
+
+
+
                                                 if (XUtil.notEmptyOrNull(query)) {
                                                     Items data = datas.get(curPosition);
                                                     if (data == null) {
@@ -277,15 +282,15 @@ public class ItemsFt extends BaseListFt {
                                                         }
                                                     }
                                                     if (flag) {
+                                                        /**
+                                                         *已读
+                                                         */
+                                                        Dbutils.readItems(tmp.getItem_id(), true);
                                                         if (lib.isLib_exb2()) {
                                                             Intent intent = new Intent(ctx, LikeActivity.class);
-                                                            intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img"));
+                                                            intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img",XUtil.getChinese(tmp.getItem_json())));
                                                             startActivity(intent);
                                                         } else {
-                                                            /**
-                                                             *已读
-                                                             */
-                                                            Dbutils.readItems(tmp.getItem_id(), true);
                                                             Intent intent = new Intent(ctx, WebViewActivity.class);
                                                             intent.putExtra("url", tmp.getItem_exs1());
                                                             startActivity(intent);
@@ -576,22 +581,53 @@ public class ItemsFt extends BaseListFt {
                             if (XUtil.isEmptyOrNull(_url)) {
                                 return;
                             }
+                            if (_url.startsWith("zson ")) {
+//                                String[] keys = _url.split(".");
+////                                XUtil.debug("obj==objkeys>"+keys[0]+" "+keys[1]);
+////                                obj = new org.json.JSONObject(obj.getString(keys[0]));
+////                                obj = new org.json.JSONObject(obj.getString(keys[1]));
+//                                obj = obj.getJSONObject("data");
+//                                XUtil.debug("obj==obj>" + obj);
+//                                obj = obj.getJSONObject("banner");
+//                                XUtil.debug("obj==obj>" + obj);
+//                                item = ret;
 
-                            if (_url.contains("/")) {
-                                String arr[] = _url.split("\\/");
-                                if (arr.length == 5) {
-                                    item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getJSONObject(arr[3]).getString(arr[4]);
-                                } else if (arr.length == 4) {
-                                    item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getString(arr[3]);
-                                } else if (arr.length == 3) {
-                                    item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getString(arr[2]);
-                                } else if (arr.length == 2) {
-                                    item = obj.getJSONObject(arr[0]).getString(arr[1]);
+                                String path = _url.substring("zson ".length(), _url.length());
+                                ZsonResult zr = ZSON.parseJson(ret);
+                                List<Object> items = zr.getValues("//" + path);
+                                XUtil.debug("path::"+path);
+                                String listStr = items.toString();
+                                listStr = listStr.substring(1,listStr.length()-1);
+                                XUtil.debug("listStr=>>" + listStr);
+                                item = listStr;
+                            }else {
+
+                                if (_url.contains("/")) {
+                                    String arr[] = _url.split("\\/");
+                                    if (arr.length == 5) {
+                                        item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getJSONObject(arr[3]).getString(arr[4]);
+                                    } else if (arr.length == 4) {
+                                        item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getJSONObject(arr[2]).getString(arr[3]);
+                                    } else if (arr.length == 3) {
+                                        item = obj.getJSONObject(arr[0]).getJSONObject(arr[1]).getString(arr[2]);
+                                    } else if (arr.length == 2) {
+                                        item = obj.getJSONObject(arr[0]).getString(arr[1]);
+                                    }
+
+                                }else {
+                                    item = obj.getString(_url);
                                 }
 
-                            } else {
-                                item = obj.getString(_url);
                             }
+
+
+
+
+
+
+
+
+
                         } catch (Exception e) {
                             item = ret;
                             e.printStackTrace();
@@ -622,20 +658,20 @@ public class ItemsFt extends BaseListFt {
 
                                 String urlPre = "";
                                 boolean isUrlStr = false;
-                                if (XUtil.notEmptyOrNull(value) && value.contains("{")&& value.contains("}")) {
+                                if (XUtil.notEmptyOrNull(value) && value.contains("{") && value.contains("}")) {
                                     /**
                                      *匹配整个网址串  https://xxx.com/thread?id={}
                                      */
                                     isUrlStr = true;
                                     urlPre = value;
-                                    value = urlPre.substring(urlPre.indexOf("{")+1,urlPre.indexOf("}"));
-                                    XUtil.debug("isUrlStr-value::"+value);
+                                    value = urlPre.substring(urlPre.indexOf("{") + 1, urlPre.indexOf("}"));
+                                    XUtil.debug("isUrlStr-value::" + value);
                                 }
 
                                 String tmp = list1.getJSONObject(i).get(value) + "";
 
-                                if (isUrlStr&&XUtil.notEmptyOrNull(urlPre)&XUtil.notEmptyOrNull(tmp) ){
-                                    tmp = urlPre.replace("{"+value+"}",tmp);
+                                if (isUrlStr && XUtil.notEmptyOrNull(urlPre) & XUtil.notEmptyOrNull(tmp)) {
+                                    tmp = urlPre.replace("{" + value + "}", tmp);
                                 }
 
                                 if (isUrl) {
@@ -900,13 +936,13 @@ public class ItemsFt extends BaseListFt {
                 break;
 
             case 10:
-             String   content = libInfo();
+                String content = libInfo();
                 try {
                     content = content.replaceAll("，", ",").replaceAll("：", ":");
                     String arr[] = content.split("\\|\\|\\|");
                     if (arr.length > 1) {
 //                        lib_exi1
-                        LocLibFt.mkLib(arr[0], arr[1],lib.getLib_exi1());
+                        LocLibFt.mkLib(arr[0], arr[1], lib.getLib_exi1());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

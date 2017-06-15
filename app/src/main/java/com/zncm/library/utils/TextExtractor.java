@@ -1,14 +1,29 @@
 package com.zncm.library.utils;
 
+/**
+ * Created by jiaomx on 2017/6/15.
+ */
+
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * <p>
+ * 在线性时间内抽取主题类（新闻、博客等）网页的正文。 采用了<b>基于行块分布函数</b>的方法，为保持通用性没有针对特定网站编写规则。
+ * 核心代码参考网络上陈鑫所写的TextExtract.java编写而成，加入了高亮显示的功能。
+ * </p>
+ *
+ * @author 倪庆洋
+ * @version 1.0, 2013-08-05
+ */
 public class TextExtractor {
 
     private final int blocksWidth;
@@ -19,6 +34,8 @@ public class TextExtractor {
 
     public TextExtractor() {
         this.blocksWidth = 3;
+        /* 当待抽取的网页正文中遇到成块的新闻标题未剔除时，只要增大此阈值即可。 */
+		/* 阈值增大，准确率提升，召回率下降；值变小，噪声会大，但可以保证抽到只有一句话的正文 */
         this.threshold = 86;
     }
 
@@ -26,12 +43,6 @@ public class TextExtractor {
         this.threshold = value;
     }
 
-    /**
-     * 提取正文，判断传入HTML，若是主题类网页，则抽取正文
-     *
-     * @param html 网页HTML字符串
-     * @return 网页正文string
-     */
     public String extract(String html) {
         StringBuilder text = new StringBuilder();
         for (TextLine textLine : this.parse(html)) {
@@ -44,55 +55,6 @@ public class TextExtractor {
     }
 
 
-    /**
-     * 高亮显示
-     *
-     * @param html 网页原文
-     * @return 加入高亮显示后的网页原文
-     */
-    public String highLighter(String html) {
-
-        List<TextLine> lines = this.parse(html);
-
-        //移除注释
-        html = html.replaceAll("(?is)<!--.*?-->", ""); // remove html comment
-        //格式化
-        html = Jsoup.parse(html).html();
-
-        List<String> htmlLines = Arrays.asList(html.split("\n"));
-        for (TextLine textLine : lines) {
-            if (textLine.getLineNumber() >= htmlLines.size()) {
-                continue;
-            }
-            if (textLine.isContent()) {
-                Element bodyElement = Jsoup.parse(textLine.getLineHtml()).body();
-                if (!textLine.getLineHtml().trim().startsWith("<") || !textLine.getLineHtml().trim().endsWith(">")) {
-                    bodyElement.html("<span class='x-boilerpipe-mark1'>" + bodyElement.html() + "<span>");
-                } else {
-                    for (Element element : bodyElement.children()) {
-                        element.html("<span class='x-boilerpipe-mark1'>" + element.html() + "</span>");
-                    }
-                }
-                htmlLines.set(textLine.getLineNumber(), bodyElement.html());
-            }
-
-        }
-        StringBuilder text = new StringBuilder();
-        for (String htmlLine : htmlLines) {
-            text.append(htmlLine);
-            text.append("\n");
-        }
-        Document document = Jsoup.parse(text.toString());
-        document.head().prepend("<style type='text/css'>.x-boilerpipe-mark1 { text-decoration:none; background-color: #ffff42 !important; color: black !important; visibility:visible !important;}</style>");
-        return document.html();
-    }
-
-    /**
-     * 预处理
-     *
-     * @param html
-     * @return
-     */
     private String preProcess(String html) {
         html = html.replaceAll("(?is)<!DOCTYPE.*?>", "");
         html = html.replaceAll("(?is)<!--.*?-->", ""); // remove html comment
@@ -102,25 +64,35 @@ public class TextExtractor {
         html = html.replaceAll("&.{2,5};|&#.{2,5};", " "); // remove special
         // char
         html = html.replaceAll("(?is)<.*?>", "");
+        // <!--[if !IE]>|xGv00|9900d21eb16fa4350a3001b3974a9415<![endif]-->
         return html;
     }
 
-    /**
-     * 判断传入HTML，若是主题类网页，则抽取正文；否则输出<b>"unkown"</b>。
-     *
-     * @return 网页正文string
-     */
-    private List<TextLine> parse(String html) {
+    private List<TextLine> parse(String url) {
+        Document doc = null;
+        try {
+             doc = Jsoup.connect(url).header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0").timeout(5000).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String    html = doc.html();
         //移除注释
         html = html.replaceAll("(?is)<!--.*?-->", ""); // remove html comment
+
         //格式化
         html = Jsoup.parse(html).html();
         List<String> htmlLines = Arrays.asList(html.split("\n"));
+
         List<TextLine> lines = new ArrayList<TextLine>();
+
         for (int i = 0; i < htmlLines.size(); i++) {
+
             boolean flag = false;
+
             TextLine textLine = new TextLine();
+
             String htmlLine = htmlLines.get(i);
+
             if (htmlLine == null) {
                 flag = true;
                 textLine.setLineHtml("");
@@ -133,7 +105,8 @@ public class TextExtractor {
                     textLine.setLineText("");
                 } else {
                     String content = body.html().trim();
-                    if ((XUtil.notEmptyOrNull(this.preProcess(content)) || content.startsWith("<") || (startPattern.matcher(content).matches() || endPattern.matcher(content).matches()))) {
+
+                    if ((content.startsWith("<") || (startPattern.matcher(content).matches() || endPattern.matcher(content).matches()))) {
                         flag = true;
                         textLine.setLineHtml(htmlLines.get(i));
                         textLine.setLineText(this.preProcess(content));
@@ -160,6 +133,7 @@ public class TextExtractor {
                 wordsNum += text.length();
             }
             indexDistribution.add(wordsNum);
+            // System.out.println(wordsNum);
         }
 
         int start = -1;
@@ -182,6 +156,7 @@ public class TextExtractor {
             }
             if (boolend) {
                 StringBuilder tmp = new StringBuilder();
+                // System.out.println(start+1 + "\t\t" + end+1);
                 List<Integer> tempList = new ArrayList<Integer>();
                 for (int ii = start; ii <= end; ii++) {
                     if (lines.get(ii).getLineText().length() < 5) {
@@ -192,6 +167,8 @@ public class TextExtractor {
                     tempList.add(ii);
                 }
                 String str = tmp.toString();
+//				System.out.println(str);
+//				System.out.println("--------------------------------");
                 if (str.contains("Copyright") && str.contains("版权所有")) {
                     continue;
                 }
@@ -206,10 +183,14 @@ public class TextExtractor {
     }
 
     public class TextLine {
+
         private int lineNumber = 0;
+        // 行内容,未经处理过的带标签的行
         private String lineHtml = null;
         private String lineText = null;
+        // 判断是否为内容
         private boolean isContent = false;
+        ;
 
         public int getLineNumber() {
             return lineNumber;
@@ -244,13 +225,16 @@ public class TextExtractor {
         }
 
     }
-//
-//    public static void main(String[] args) throws Exception {
-//        String url = "http://sspai.com/32227";
-//        Document doc;
-//        doc = Jsoup.connect(url).timeout(1000).get();
-//        String html = doc.html();
-//        String content = new TextExtractor().extract(html);
-//        System.out.println(content);
-//    }
+
+    public static void main(String[] args) throws Exception {
+
+        String url = "http://www.3lian.com/zl/2016/06-20/1466390175460735.html";
+
+        //此处缺失的类，自己写即可，只要读取出html内容就可以进行测试
+//        byte[] data = HtmlUtil.readURLToBytes(url);
+//        String html = EncodingUtil.toString(data);
+
+        String content = new TextExtractor().extract(url);
+        System.out.println(content);
+    }
 }

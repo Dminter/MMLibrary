@@ -63,4 +63,5 @@ dependencies {
     compile files('libs/javacsv.jar')
     compile files('libs/umeng-onlineconfig_v1.0.0.jar')
     compile files('libs/fastjson-1.2.7.jar')
+    compile files('libs/zson.jar')
 }
