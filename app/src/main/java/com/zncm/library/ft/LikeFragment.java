@@ -1,41 +1,24 @@
 package com.zncm.library.ft;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.nanotasks.BackgroundWork;
-import com.nanotasks.Completion;
-import com.nanotasks.Tasks;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.zncm.library.R;
 import com.zncm.library.adapter.DetailsAdapter;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.DetailInfo;
-import com.zncm.library.data.EnumData;
-import com.zncm.library.data.Fields;
 import com.zncm.library.data.Info;
-import com.zncm.library.data.Items;
-import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
-import com.zncm.library.data.RefreshEvent;
-import com.zncm.library.data.SpConstant;
 import com.zncm.library.ui.LikeActivity;
 import com.zncm.library.ui.PhotoAc;
-import com.zncm.library.utils.Dbutils;
-import com.zncm.library.utils.MySp;
-import com.zncm.library.utils.TextExtractor;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
 import com.zncm.library.view.loadmore.MxItemClickListener;
@@ -48,12 +31,6 @@ import org.jsoup.select.Elements;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
-import de.greenrobot.event.EventBus;
 
 
 public class LikeFragment extends BaseListFragment {
@@ -61,9 +38,10 @@ public class LikeFragment extends BaseListFragment {
     private LikeActivity ctx;
     private boolean onLoading = false;
     DetailInfo info;
-    ArrayList<Info> list;
-    String content ;
-    MaterialEditText editText;
+    ArrayList<Info> list = new ArrayList<>();
+    String content;
+
+    //    MaterialEditText editText;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -76,6 +54,8 @@ public class LikeFragment extends BaseListFragment {
 
         ctx.myTitle(info.getTitle());
 
+
+        listView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         addButton.setVisibility(View.GONE);
         mAdapter = new DetailsAdapter(ctx) {
             @Override
@@ -93,6 +73,17 @@ public class LikeFragment extends BaseListFragment {
                                 super.onLoadingStarted(imageUri, view);
                             }
                         });
+
+
+                if (XUtil.notEmptyOrNull(tmp.getContent())) {
+                    holder.imageView.setVisibility(View.GONE);
+                    holder.tvContent.setVisibility(View.VISIBLE);
+                    holder.tvContent.setText(tmp.getContent());
+                } else {
+                    holder.imageView.setVisibility(View.VISIBLE);
+                    holder.tvContent.setVisibility(View.GONE);
+                }
+
 
                 holder.setClickListener(new MxItemClickListener() {
                     @Override
@@ -121,28 +112,24 @@ public class LikeFragment extends BaseListFragment {
         getData(true);
 
 
-         editText = new MaterialEditText(ctx);
-//                editText.setAutoLinkMask(Linkify.ALL);
-        if (MySp.get(SpConstant.isShowTitle, Boolean.class, true)) {
-            editText.setFloatingLabelText("信息");
-
-        } else {
-            editText.setHideUnderline(true);
-        }
-        editText.setTextColor(getResources().getColor(R.color.black));
-        editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
-        editText.setFloatingLabelAlwaysShown(true);
-        editText.setEnabled(false);
-        editText.setFocusable(false);
-        editText.setPaddings(XUtil.dip2px(10),XUtil.dip2px(10),XUtil.dip2px(10),XUtil.dip2px(10));
-        ScrollView scrollView = new ScrollView(ctx);
-        scrollView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        scrollView.addView(editText);
-        headView.addView(scrollView);
-        headView.setVisibility(View.VISIBLE);
-
-
+//         editText = new MaterialEditText(ctx);
+//        if (MySp.get(SpConstant.isShowTitle, Boolean.class, true)) {
+//            editText.setFloatingLabelText("信息");
+//
+//        } else {
+//            editText.setHideUnderline(true);
+//        }
+//        editText.setTextColor(getResources().getColor(R.color.black));
+//        editText.setFloatingLabel(MaterialEditText.FLOATING_LABEL_HIGHLIGHT);
+//        editText.setFloatingLabelAlwaysShown(true);
+//        editText.setEnabled(false);
+//        editText.setFocusable(false);
+//        editText.setPaddings(XUtil.dip2px(10),XUtil.dip2px(10),XUtil.dip2px(10),XUtil.dip2px(10));
+//        ScrollView scrollView = new ScrollView(ctx);
+//        scrollView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+//        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+//        scrollView.addView(editText);
+//        listView.addView(scrollView);
 
 
         return view;
@@ -224,15 +211,23 @@ public class LikeFragment extends BaseListFragment {
 
         protected void onPostExecute(Boolean canLoadMore) {
             super.onPostExecute(canLoadMore);
+            if (!XUtil.listNotNull(list) && XUtil.notEmptyOrNull(content)) {
+                listView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                list.add(new Info("", "", content));
+            }
+
+
             mAdapter.setItems(list, listView);
+
+
             swipeLayout.setRefreshing(false);
             onLoading = false;
             listView.setCanLoadMore(canLoadMore);
 
 
-            if (XUtil.notEmptyOrNull(content)){
-                editText.setText(content);
-            }
+//            if (XUtil.notEmptyOrNull(content)&&editText!=null){
+//                editText.setText(content);
+//            }
 
         }
     }

@@ -9,6 +9,15 @@ public class Info extends BaseData {
     public String url;
     public String content;
 
+    public Info() {
+    }
+
+    public Info(String img, String url, String content) {
+        this.img = img;
+        this.url = url;
+        this.content = content;
+    }
+
     public String getImg() {
         return img;
     }

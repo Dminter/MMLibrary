@@ -11,7 +11,6 @@
 
 
         <android.support.v4.widget.SwipeRefreshLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/swipeLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -19,12 +18,6 @@
                 android:orientation="vertical">
 
 
-            <LinearLayout android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:id="@+id/headView"
-                          android:orientation="vertical"
-                          android:visibility="gone"
-            />
 
             <com.zncm.library.view.loadmore.LoadMoreRecyclerView
                     android:id="@+id/listView"
@@ -36,8 +29,6 @@
 
 
         </android.support.v4.widget.SwipeRefreshLayout>
-
-
         <com.melnykov.fab.FloatingActionButton
                 android:id="@+id/button_floating_action"
                 android:layout_width="wrap_content"

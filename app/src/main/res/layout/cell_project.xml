@@ -8,7 +8,6 @@
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cardView"
         style="@style/Material_Card_View"
-        android:foreground="@drawable/card_foreground"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:cardElevation="@dimen/card_elevation">
 
@@ -22,7 +21,8 @@
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="140dp"
+                android:scaleType="centerCrop"
                 android:visibility="visible" />
 
             <TextView
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text=""
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:visibility="gone" />
 
 
