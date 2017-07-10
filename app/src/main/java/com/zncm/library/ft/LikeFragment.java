@@ -31,6 +31,8 @@ import org.jsoup.select.Elements;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class LikeFragment extends BaseListFragment {
@@ -39,6 +41,7 @@ public class LikeFragment extends BaseListFragment {
     private boolean onLoading = false;
     DetailInfo info;
     ArrayList<Info> list = new ArrayList<>();
+    Set<String> imgUrls = new HashSet<>();
     String content;
 
     //    MaterialEditText editText;
@@ -164,8 +167,9 @@ public class LikeFragment extends BaseListFragment {
                 if (elements == null || elements.size() == 0) {
                     elements = doc.getElementsByAttribute(elementsKey);
                 }
-                list = new ArrayList<Info>();
-
+                if (params[0]) {
+                    list = new ArrayList<Info>();
+                }
                 Info tmp = new Info();
 
                 if (XUtil.listNotNull(elements)) {
@@ -184,13 +188,11 @@ public class LikeFragment extends BaseListFragment {
                             }
                             _durl = base + _durl;
                         }
-                        if (elementsKey.contains("img")) {
+                        if (elementsKey.contains("img") && imgUrls.add(_durl)&&!_durl.endsWith(".gif")) {
                             tmp.setImg(_durl);
-                        } else {
-                            tmp.setContent(element.text());
+                            list.add(tmp);
                         }
                         XUtil.debug("  " + element.html() + "-- " + _durl);
-                        list.add(tmp);
                     }
                 } else {
                     tmp.setContent(doc.html());
@@ -204,6 +206,7 @@ public class LikeFragment extends BaseListFragment {
             return canLoadMore;
         }
 
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -211,7 +214,10 @@ public class LikeFragment extends BaseListFragment {
 
         protected void onPostExecute(Boolean canLoadMore) {
             super.onPostExecute(canLoadMore);
-            if (!XUtil.listNotNull(list) && XUtil.notEmptyOrNull(content)) {
+
+
+            if (!XUtil.listNotNull(list) && XUtil.notEmptyOrNull(content) || list.size() <= 6 && XUtil.notEmptyOrNull(content) && content.length() > 80) {
+                list = new ArrayList<>();
                 listView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
                 list.add(new Info("", "", content));
             }
@@ -255,14 +261,14 @@ public class LikeFragment extends BaseListFragment {
     private void refresh() {
         onLoading = true;
         swipeLayout.setRefreshing(true);
-        getData(true);
+//        getData(true);
     }
 
 
     @Override
     public void onLoadMore() {
 
-        getData(false);
+//        getData(false);
 
     }
 
