@@ -112,13 +112,20 @@ public class ItemsFt extends BaseListFt {
         }
 
         Serializable dataParam = ctx.getIntent().getSerializableExtra(Constant.KEY_PARAM_DATA);
-        if (dataParam != null && dataParam instanceof Lib) {
-            lib = (Lib) dataParam;
-            if (XUtil.notEmptyOrNull(lib.getLib_name())) {
-                ctx.myTitle(lib.getLib_name());
-            }
-        }
+        int lib_id = ctx.getIntent().getIntExtra("lib_id", 0);
+        if (lib_id != 0) {
+            lib = Dbutils.findLib(lib_id);
+        } else {
+            if (dataParam != null && dataParam instanceof Lib) {
+                lib = (Lib) dataParam;
 
+            }
+
+        }
+        if (lib != null && XUtil.notEmptyOrNull(lib.getLib_name())) {
+            ctx.libId = lib.getLib_id();
+            ctx.myTitle(lib.getLib_name());
+        }
         addButton.setVisibility(View.VISIBLE);
         datas = new ArrayList<Items>();
 
@@ -252,9 +259,6 @@ public class ItemsFt extends BaseListFt {
                                                 int curPosition = position - listView.getHeaderViewsCount();
 
 
-
-
-
                                                 if (XUtil.notEmptyOrNull(query)) {
                                                     Items data = datas.get(curPosition);
                                                     if (data == null) {
@@ -269,7 +273,6 @@ public class ItemsFt extends BaseListFt {
                                                     startActivity(intent);
 
                                                 } else {
-                                                    XUtil.debug("data::" + datas.get(curPosition));
                                                     Items tmp = datas.get(curPosition);
                                                     boolean flag = false;
                                                     if (MySp.get(SpConstant.isOpenUrl, Boolean.class, false)) {
@@ -288,7 +291,7 @@ public class ItemsFt extends BaseListFt {
                                                         Dbutils.readItems(tmp.getItem_id(), true);
                                                         if (lib.isLib_exb2()) {
                                                             Intent intent = new Intent(ctx, LikeActivity.class);
-                                                            intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img",XUtil.getChinese(tmp.getItem_json())));
+                                                            intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img", XUtil.getChinese(tmp.getItem_json())));
                                                             startActivity(intent);
                                                         } else {
                                                             Intent intent = new Intent(ctx, WebViewActivity.class);
@@ -552,11 +555,7 @@ public class ItemsFt extends BaseListFt {
                 public void onResponse(String response) {
                     try {
                         String ret = response.toString();
-
-                        XUtil.debug("ret::" + ret);
-
                         String item = "";
-
                         String _url = "";
                         Map<Integer, String> map = new HashMap<Integer, String>();
                         Map<Integer, ArrayList<String>> mapOut = new HashMap<Integer, ArrayList<String>>();
@@ -569,39 +568,23 @@ public class ItemsFt extends BaseListFt {
                                 } else if (i == 1) {
                                     _url = name;
                                 } else {
-//                                    items.add(name);
                                     map.put(_id, name);
                                 }
-                                XUtil.debug("name===>>" + name);
                             }
                         }
                         try {
                             org.json.JSONObject obj = new org.json.JSONObject(ret);
-                            String _link = "";
                             if (XUtil.isEmptyOrNull(_url)) {
                                 return;
                             }
                             if (_url.startsWith("zson ")) {
-//                                String[] keys = _url.split(".");
-////                                XUtil.debug("obj==objkeys>"+keys[0]+" "+keys[1]);
-////                                obj = new org.json.JSONObject(obj.getString(keys[0]));
-////                                obj = new org.json.JSONObject(obj.getString(keys[1]));
-//                                obj = obj.getJSONObject("data");
-//                                XUtil.debug("obj==obj>" + obj);
-//                                obj = obj.getJSONObject("banner");
-//                                XUtil.debug("obj==obj>" + obj);
-//                                item = ret;
-
                                 String path = _url.substring("zson ".length(), _url.length());
                                 ZsonResult zr = ZSON.parseJson(ret);
                                 List<Object> items = zr.getValues("//" + path);
-                                XUtil.debug("path::"+path);
                                 String listStr = items.toString();
-                                listStr = listStr.substring(1,listStr.length()-1);
-                                XUtil.debug("listStr=>>" + listStr);
+                                listStr = listStr.substring(1, listStr.length() - 1);
                                 item = listStr;
-                            }else {
-
+                            } else {
                                 if (_url.contains("/")) {
                                     String arr[] = _url.split("\\/");
                                     if (arr.length == 5) {
@@ -614,36 +597,21 @@ public class ItemsFt extends BaseListFt {
                                         item = obj.getJSONObject(arr[0]).getString(arr[1]);
                                     }
 
-                                }else {
+                                } else {
                                     item = obj.getString(_url);
                                 }
 
                             }
 
 
-
-
-
-
-
-
-
                         } catch (Exception e) {
                             item = ret;
                             e.printStackTrace();
                         }
-
-
                         JSONArray list1 = JSON.parseArray(item);
-//                        for (Object tmp : list
-//                                ) {
-//                            XUtil.debug("tmp:::" + tmp.ge);
-//
-
                         if (XUtil.listNotNull(list1)) {
                             Collections.reverse(list1);
                         }
-
                         for (int i = 0; i < list1.size(); i++) {
                             Map<String, Object> tmpMap = new HashMap<>();
                             String link = "";
@@ -654,8 +622,6 @@ public class ItemsFt extends BaseListFt {
                                     value = value.substring(1);
                                     isUrl = true;
                                 }
-
-
                                 String urlPre = "";
                                 boolean isUrlStr = false;
                                 if (XUtil.notEmptyOrNull(value) && value.contains("{") && value.contains("}")) {
@@ -665,15 +631,11 @@ public class ItemsFt extends BaseListFt {
                                     isUrlStr = true;
                                     urlPre = value;
                                     value = urlPre.substring(urlPre.indexOf("{") + 1, urlPre.indexOf("}"));
-                                    XUtil.debug("isUrlStr-value::" + value);
                                 }
-
                                 String tmp = list1.getJSONObject(i).get(value) + "";
-
                                 if (isUrlStr && XUtil.notEmptyOrNull(urlPre) & XUtil.notEmptyOrNull(tmp)) {
                                     tmp = urlPre.replace("{" + value + "}", tmp);
                                 }
-
                                 if (isUrl) {
                                     link = tmp;
                                 } else {
@@ -682,7 +644,6 @@ public class ItemsFt extends BaseListFt {
                                 tmpMap.put(in + "", tmp);
                             }
                             JSON json = new JSONObject(tmpMap);
-                            XUtil.debug("json:" + json + " " + tmpMap);
                             if (map.size() > 0) {
                                 Items items = new Items(lib.getLib_id(), json.toJSONString());
                                 if (XUtil.notEmptyOrNull(link)) {
@@ -692,60 +653,10 @@ public class ItemsFt extends BaseListFt {
                             }
 
                         }
-
-
                         ArrayList list = new ArrayList<>();
                         list.add(XUtil.getDateFullSec());
                         ShareAc.saveDataList(lib.getLib_id(), list);
                         EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
-
-//
-//                        }
-//                        for (Integer in : map.keySet()) {
-//                            ArrayList<String> list = new ArrayList<String>();
-//                            for (int i = 0; i < list1.size(); i++) {
-//                                String value = map.get(in);
-//                                Object tmp = list1.getJSONObject(i).get(value);
-////                                XUtil.debug("===>>>" + tmp + " " + value);
-//                                list.add(tmp + "");
-//                            }
-//
-//                            mapOut.put(in, list);
-//                        }
-//
-//
-//                        Map<String, Object> tmpMap;
-//
-//                        for (Integer in : mapOut.keySet()) {
-//                            tmpMap = new HashMap<>();
-//
-//                            ArrayList<String> list = new ArrayList<String>();
-//                            list = mapOut.get(in);
-//                            for (int i = 0; i < list.size(); i++) {
-//                                String tmp = list.get(i);
-//                                tmpMap.put(in + "", tmp);
-//                                JSON json = new JSONObject(tmpMap);
-//                                XUtil.debug("json:" + json + " " + tmpMap);
-//                                if (map.size() > 0) {
-//                                    Items items = new Items(lib.getLib_id(), json.toJSONString());
-//                                    Dbutils.addItems(items);
-//                                }
-//                            }
-//
-//                        }
-
-
-//                        item = new org.json.JSONObject(item).getString("contentlist");
-//                        final ArrayList<Feed> list = (ArrayList<Feed>) JSON.parseArray(item, Feed.class);
-
-//                        final ArrayList<String> items = new ArrayList<>();
-//                        for (Feed tmp : list
-//                                ) {
-//                            XUtil.debug("tmp==>>" + tmp);
-//                            items.add(tmp.getTitle());
-//                        }
-
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -805,6 +716,7 @@ public class ItemsFt extends BaseListFt {
                 sub.add(0, 9, 0, "网页详情页");
             }
         }
+        sub.add(0, 11, 0, "发送到桌面");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
@@ -948,6 +860,10 @@ public class ItemsFt extends BaseListFt {
                     e.printStackTrace();
                 }
                 XUtil.tLong("库结构已克隆~");
+                break;
+
+            case 11:
+                XUtil.sendToDesktop(ctx, lib);
                 break;
         }
 

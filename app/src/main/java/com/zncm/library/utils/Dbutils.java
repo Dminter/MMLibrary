@@ -436,7 +436,6 @@ public class Dbutils {
     public static void addLocLib(LocLib lib) {
         init();
         try {
-            XUtil.debug("lib===>" + lib);
             if (!XUtil.notEmptyOrNull(lib.getLoc_name())) {
                 return;
             }

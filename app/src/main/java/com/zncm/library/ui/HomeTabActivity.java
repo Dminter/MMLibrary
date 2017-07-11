@@ -187,18 +187,12 @@ public class HomeTabActivity extends TabActivity {
             if (Intent.ACTION_VIEW.equalsIgnoreCase(intent.getAction())) {
                 // 得到文件地址,并且转换编码,不然会出现乱码
                 Uri uri = intent.getData();
-                if (uri != null) {
-                    XUtil.debug("uri: " + uri);
-                }
                 intent.setData(null);
                 intent.setAction(null);
             } else if (Intent.ACTION_SEND.equalsIgnoreCase(intent.getAction())) {
                 Bundle extras = intent.getExtras();
                 if (extras.containsKey("android.intent.extra.STREAM")) {
                     Uri uri = (Uri) extras.get("android.intent.extra.STREAM");
-                    if (uri != null) {
-                        XUtil.debug("uri-STREAM: " + uri);
-                    }
                 }
                 intent.setData(null);
                 intent.setAction(null);

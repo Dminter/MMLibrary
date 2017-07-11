@@ -121,11 +121,8 @@ public class WebViewActivity extends BaseAc {
                             Elements srcLinks = doc.select("img[src$=.jpg]");
                             for (Element link : srcLinks) {
                                 String imagesPath = link.attr("src");
-                                XUtil.debug("imagesPath==>" + imagesPath);
                                 ShareAc.initSave(Constant.SYS_PICS, url, imagesPath);
                             }
-//                            String html = doc.html();
-//                            String content = new TextExtractor().extract(html);
                             return true;
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -157,10 +154,6 @@ public class WebViewActivity extends BaseAc {
             public void onProgressChanged(WebView view, int progress) {
                 getSupportActionBar().setTitle(view.getTitle());
 
-                if (progress == 100 && XUtil.notEmptyOrNull(view.getTitle())) {
-                    XUtil.debug("progress == 100" + url + " " + view.getTitle());
-
-                }
             }
         });
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -297,7 +290,6 @@ public class WebViewActivity extends BaseAc {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                XUtil.debug("query:" + query);
                 if (XUtil.notEmptyOrNull(query)) {
                     if (query.startsWith("http") || query.startsWith("www")) {
                         mWebView.loadUrl(query);
@@ -373,7 +365,6 @@ public class WebViewActivity extends BaseAc {
                 .setDownloadListener(new DownloadStatusListener() {
                     @Override
                     public void onDownloadComplete(int id) {
-                        XUtil.debug("onDownloadComplete" + id);
                         if (isImport) {
                             if (newFile.contains("csv") || newFile.contains("txt")) {
                                 if (url.equals(Constant.LOCLIB_NET)) {
@@ -385,15 +376,9 @@ public class WebViewActivity extends BaseAc {
                                 XUtil.tShort("格式不支持");
                             }
                         }
-
-//                        XUtil.debug("下载完毕");
                         XUtil.tLong("文件下载完毕：" + newFile);
-
                         Intent openUnKnowFileIntent = FileMiniUtil.getUnKnowIntent(newFile);
                         NotiHelper.noti("下载完成", newFile, "文件下载完毕~~~", openUnKnowFileIntent, false, new Random().nextInt());
-
-//                        XUtil.openFile(ctx, newFile);
-
                         if (XUtil.notEmptyOrNull(newFile)) {
                             ShareAc.initSave(Constant.SYS_FILE_DOWNLOAD, newFile, url);
                         }
@@ -402,13 +387,11 @@ public class WebViewActivity extends BaseAc {
 
                     @Override
                     public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-                        XUtil.debug("onDownloadComplete" + id + " " + errorCode + " " + errorMessage);
                     }
 
 
                     @Override
                     public void onProgress(int id, long totalBytes, long downloadedBytes, int progress) {
-                        XUtil.debug("onDownloadComplete" + id + " " + progress);
                     }
                 });
         downloadManager.add(downloadRequest);
@@ -521,9 +504,7 @@ public class WebViewActivity extends BaseAc {
                 break;
 
             case 13:
-                Intent intent = new Intent(ctx, PlayActivity.class);
-                intent.putExtra(Constant.KEY_PARAM_DATA, new VideoInfo(url, url));
-                startActivity(intent);
+
                 break;
 
             case 14:
@@ -594,7 +575,6 @@ public class WebViewActivity extends BaseAc {
         sub.add(0, 10, 0, "添加到网络库");
         sub.add(0, 11, 0, "html源码");
         sub.add(0, 12, 0, "添加RSS源");
-        sub.add(0, 13, 0, "播放页面视频");
         sub.add(0, 14, 0, "添加到API库");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);

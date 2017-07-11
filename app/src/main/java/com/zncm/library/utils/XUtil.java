@@ -35,6 +35,7 @@ import com.zncm.library.R;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
+import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.ShowInfoActivity;
 
@@ -54,12 +55,77 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XUtil {
+
+
+    public static void sendToDesktop(Activity activity, Lib lib) {
+
+        Intent intent;
+        intent = new Intent();
+        Intent shortIntent = new Intent(activity, ItemsAc.class);
+        shortIntent.putExtra("lib_id", lib.getLib_id());
+//        shortIntent.putExtra(Constant.KEY_PARAM_DATA, lib);
+        shortIntent.setAction("android.intent.action.VIEW");
+        shortIntent.putExtra("android.intent.extra.UID", 0);
+        shortIntent.putExtra("random", new Random().nextLong());
+        intent.putExtra("android.intent.extra.shortcut.INTENT", shortIntent);
+        intent.putExtra("android.intent.extra.shortcut.NAME", makeShortcutIconTitle(lib.getLib_name()));
+
+        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                Intent.ShortcutIconResource.fromContext(activity,
+                        R.drawable.ic_lib));
+        intent.putExtra("duplicate", false);
+        intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+        activity.sendBroadcast(intent);
+
+
+//        Intent addShortcutIntent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
+//
+//        // 不允许重复创建
+//        addShortcutIntent.putExtra("duplicate", false);// 经测试不是根据快捷方式的名字判断重复的
+//        // 应该是根据快链的Intent来判断是否重复的,即Intent.EXTRA_SHORTCUT_INTENT字段的value
+//        // 但是名称不同时，虽然有的手机系统会显示Toast提示重复，仍然会建立快链
+//        // 屏幕上没有空间时会提示
+//        // 注意：重复创建的行为MIUI和三星手机上不太一样，小米上似乎不能重复创建快捷方式
+//
+//        // 名字
+//        addShortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, makeShortcutIconTitle(lib.getLib_name()));
+//
+//        // 图标
+//        addShortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+//                Intent.ShortcutIconResource.fromContext(activity,
+//                        R.drawable.ic_lib));
+//        // 设置关联程序
+//        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
+//        launcherIntent.setClass(activity, ItemsAc.class);
+//        launcherIntent.putExtra("lib_id", lib.getLib_id());
+//        launcherIntent.putExtra("random", new Random().nextLong());
+//        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+//
+//        addShortcutIntent
+//                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, launcherIntent);
+//        // 发送广播
+//        activity.sendBroadcast(addShortcutIntent);
+        tShort("已创建快捷方式");
+    }
+
+    // 创建快捷方式
+    public static String makeShortcutIconTitle(String content) {
+        final int SHORTCUT_ICON_TITLE_MAX_LEN = 10;
+        final String TAG_CHECKED = String.valueOf('\u221A');
+        final String TAG_UNCHECKED = String.valueOf('\u25A1');
+        content = content.replace(TAG_CHECKED, "");
+        content = content.replace(TAG_UNCHECKED, "");
+        return content.length() > SHORTCUT_ICON_TITLE_MAX_LEN ? content.substring(0,
+                SHORTCUT_ICON_TITLE_MAX_LEN) : content;
+    }
+
     public static Integer getVersionCode(Activity ctx) {
 
         // 获取packagemanager的实例
@@ -319,12 +385,13 @@ public class XUtil {
         content = content.replaceAll("//<.*?>", "");
         return content;
     }
+
     public static String getChinese(String paramValue) {
         String regex = "([\u4e00-\u9fa5]+)";
         String str = "";
         Matcher matcher = Pattern.compile(regex).matcher(paramValue);
         while (matcher.find()) {
-            str+= matcher.group(0);
+            str += matcher.group(0);
         }
         return str;
     }
@@ -335,8 +402,7 @@ public class XUtil {
         }
         content = content.replaceAll("\\\\u00A0", "");
         content = content.trim();
-        Spanned  contentHtml  = Html.fromHtml(content);
-        XUtil.debug("===>>>"+contentHtml);
+        Spanned contentHtml = Html.fromHtml(content);
         return contentHtml;
     }
 

@@ -2,7 +2,6 @@ package com.zncm.library.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.zncm.library.R;
 import com.zncm.library.data.EnumData;
@@ -16,6 +15,21 @@ import de.greenrobot.event.EventBus;
 public class ItemsAc extends BaseAc {
     ItemsFt itemsFt = new ItemsFt();
     public String key;
+    public int libId = 0;
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        int lib_id = intent.getIntExtra("lib_id", 0);
+        if (lib_id != 0 && lib_id == libId) {
+            itemsFt = new ItemsFt();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, itemsFt)
+                    .commit();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

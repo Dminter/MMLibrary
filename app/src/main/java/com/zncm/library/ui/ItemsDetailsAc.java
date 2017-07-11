@@ -40,19 +40,6 @@ public class ItemsDetailsAc extends BaseAc {
         return R.layout.activity_add;
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        Serializable dataParam = getIntent().getSerializableExtra(Constant.KEY_PARAM_DATA);
-        if (dataParam != null && dataParam instanceof Lib) {
-            Lib lib = (Lib) dataParam;
-            if (XUtil.notEmptyOrNull(lib.getLib_name())) {
-                XUtil.debug("name:" + lib.getLib_name());
-            }
-        }
-    }
-
     public void onEvent(ObjEvent event) {
         int type = event.type;
         obj = event.obj;

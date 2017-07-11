@@ -519,10 +519,7 @@ public class ItemsAddFt extends Fragment implements DatePickerDialog.OnDateSetLi
                     map.put(String.valueOf(tmp.getFields_id()), ratingBar.getRating());
                 }
             }
-
-
             JSON json = new JSONObject(map);
-            XUtil.debug("json:" + json + " " + map);
             if (map.size() > 0) {
                 if (bUpdate) {
                     updateItems.setItem_json(json.toJSONString());

@@ -293,12 +293,10 @@ public class ApiFt extends BaseFt {
                 public void onResponse(String response) {
                     try {
                         String ret = response.toString();
-                        XUtil.debug("ret=" + ret);
                         org.json.JSONObject obj = new org.json.JSONObject(ret);
                         String item = obj.getString("showapi_res_body");
                         item = new org.json.JSONObject(item).getString("pagebean");
                         item = new org.json.JSONObject(item).getString("contentlist");
-                        XUtil.debug("item=" + item);
                         ArrayList<News> list = (ArrayList<News>) JSON.parseArray(item, News.class);
                         for (News tmp : list
                                 ) {
@@ -360,7 +358,6 @@ public class ApiFt extends BaseFt {
                         String ret = response.toString();
                         for (int i = 0; i < 10; i++) {
                             org.json.JSONObject obj = new org.json.JSONObject(ret);
-                            XUtil.debug("ret==>" + ret);
                             String item = obj.getString(i + "");
                             WxHot tmp = JSON.parseObject(item, WxHot.class);
                             ArrayList<String> strs = new ArrayList<>();
@@ -411,11 +408,9 @@ public class ApiFt extends BaseFt {
                 public void onResponse(String response) {
                     try {
                         String ret = response.toString();
-                        XUtil.debug("ret=" + ret);
                         org.json.JSONObject obj = new org.json.JSONObject(ret);
                         String item = obj.getString("showapi_res_body");
                         item = new org.json.JSONObject(item).getString("contentlist");
-                        XUtil.debug("item=" + item);
                         ArrayList<Joke> list = (ArrayList<Joke>) JSON.parseArray(item, Joke.class);
                         for (Joke tmp : list
                                 ) {
@@ -515,7 +510,6 @@ public class ApiFt extends BaseFt {
                         String mTitle = doc.title().toString();
                         mTitle = mTitle.replaceAll(" - 百度百科", "");
                         mConent = mConent.replaceAll("\\[.*?]", "").replaceAll("百科名片 ", "");
-                        XUtil.debug("mTitle:" + mTitle + "  mConent:" + mConent);
                         ArrayList<String> strs = new ArrayList<>();
                         if (XUtil.notEmptyOrNull(mConent)) {
                             strs.add(mTitle);
@@ -573,17 +567,8 @@ public class ApiFt extends BaseFt {
                         final ArrayList<String> items = new ArrayList<>();
                         for (Feed tmp : list
                                 ) {
-//                            ArrayList<String> strs = new ArrayList<>();
-//                            if (tmp != null) {
-//                                strs.add(tmp.getTitle());
-//                                strs.add(tmp.getImg());
-//                                ShareAc.initSaveList(Constant.SYS_XH_PIC, Constant.SYS_XH_PIC_MK, strs);
-//                            }
-                            XUtil.debug("tmp==>>" + tmp);
                             items.add(tmp.getTitle());
                         }
-
-
                         new MaterialDialog.Builder(ctx)
                                 .items(items)
                                 .itemsCallback(new MaterialDialog.ListCallback() {
@@ -597,8 +582,6 @@ public class ApiFt extends BaseFt {
                                             ShareAc.initLibRss(items.get(which), content);
                                             EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
                                             XUtil.tShort("已添加" + items.get(which));
-//                                            return;
-//                                            XUtil.dismissShowDialog(dialog, false);
                                         }
                                     }
                                 })

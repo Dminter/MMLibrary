@@ -150,12 +150,8 @@ public class LikeFragment extends BaseListFragment {
 
             boolean canLoadMore = true;
             try {
-
                 content = ContentExtractor.getContentByURL(info.getUrl());
-//                content = new TextExtractor().extract(info.getUrl());
-
                 Document doc = Jsoup.connect(info.getUrl()).timeout(3000).get();
-                XUtil.debug("getUrl==>>" + info.getUrl());
                 String elementsKey = info.getKey();
                 Elements elements = doc.select(elementsKey);
                 if (elements == null || elements.size() == 0) {
@@ -171,7 +167,6 @@ public class LikeFragment extends BaseListFragment {
                     list = new ArrayList<Info>();
                 }
                 Info tmp = new Info();
-
                 if (XUtil.listNotNull(elements)) {
                     Collections.reverse(elements);
                     for (Element element : elements) {
@@ -182,7 +177,6 @@ public class LikeFragment extends BaseListFragment {
                         }
                         if (XUtil.notEmptyOrNull(_durl) && _durl.startsWith("/")) {
                             String base = doc.baseUri();
-//                                        String base = element.baseUri();
                             if (XUtil.notEmptyOrNull(base) && base.endsWith("/")) {
                                 base = base.substring(0, base.length() - 1);
                             }
@@ -192,14 +186,10 @@ public class LikeFragment extends BaseListFragment {
                             tmp.setImg(_durl);
                             list.add(tmp);
                         }
-                        XUtil.debug("  " + element.html() + "-- " + _durl);
                     }
                 } else {
                     tmp.setContent(doc.html());
                 }
-
-
-                XUtil.debug("list===>>" + list);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -482,8 +482,6 @@ public class ItemsDetailsFt extends Fragment {
                 editText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        XUtil.debug("diary===>>" + itemsList.get(mViewPager.getCurrentItem()));
                         Items curItem = itemsList.get(mViewPager.getCurrentItem());
                         Intent intent = new Intent(ctx, WebViewActivity.class);
                         intent.putExtra("url", curItem.getItem_exs1());

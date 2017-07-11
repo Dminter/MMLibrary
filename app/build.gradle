@@ -55,10 +55,9 @@ dependencies {
     compile 'me.gujun.android.taggroup:library:1.4@aar'
     compile 'com.fabiendevos:nanotasks:1.1.0'
     compile 'com.mcxiaoke.volley:library:1.0.17'
-    compile 'com.jude:swipebackhelper:2.1.5'
+    compile 'com.jude:swipebackhelper:3.1.2'
     compile 'com.github.kenumir:MaterialSettings:v.1.2.2'
     compile 'cn.yipianfengye.android:zxing-library:2.1'
-    compile 'com.github.CarGuo:GSYVideoPlayer:v1.6.0'
     compile 'com.android.support:cardview-v7:24.0.0'
     compile files('libs/javacsv.jar')
     compile files('libs/umeng-onlineconfig_v1.0.0.jar')

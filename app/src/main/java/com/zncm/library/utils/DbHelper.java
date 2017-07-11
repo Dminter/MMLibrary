@@ -77,7 +77,6 @@ public class DbHelper {
                 for (int j = 0; j < datas.size(); j++) {
                     String tmp = datas.get(j);
                     tmp = tmp.replace("\"", "");
-                    XUtil.debug("tmp:" + tmp);
                     String[] tmpInfo = tmp.split(",");
                     if (tmpInfo.length == 7) {
                         LocLib locLib = new LocLib(tmpInfo[0], tmpInfo[1], tmpInfo[2], tmpInfo[3], tmpInfo[4], tmpInfo[5], tmpInfo[6]);

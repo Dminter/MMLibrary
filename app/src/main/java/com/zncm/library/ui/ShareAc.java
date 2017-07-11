@@ -46,8 +46,6 @@ public class ShareAc extends BaseAc {
             if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND)) {
                 Bundle extras = intent.getExtras();
                 String content = String.valueOf(extras.getString(Intent.EXTRA_TEXT));
-                XUtil.debug("share: " + content);
-
                 if (!XUtil.notEmptyOrNull(content)) {
                     return;
                 }

@@ -150,7 +150,6 @@ public class ApiUrils {
     private static void getDataNews(final Queue<Integer> myQueue) {
         try {
             int page = myQueue.poll();
-            //XUtil.tShort(Constant.SYS_NEWS + "-正在下载，第" + page + "页");
             RequestQueue mVolleyQueue = Volley.newRequestQueue(MyApplication.getInstance().ctx);
             String url = "http://apis.baidu.com/showapi_open_bus/channel_news/search_news?page=" + page;
             MyStringRequest myStringRequest = new MyStringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -158,12 +157,10 @@ public class ApiUrils {
                 public void onResponse(String response) {
                     try {
                         String ret = response.toString();
-                        XUtil.debug("ret=" + ret);
                         org.json.JSONObject obj = new org.json.JSONObject(ret);
                         String item = obj.getString("showapi_res_body");
                         item = new org.json.JSONObject(item).getString("pagebean");
                         item = new org.json.JSONObject(item).getString("contentlist");
-                        XUtil.debug("item=" + item);
                         ArrayList<News> list = (ArrayList<News>) JSON.parseArray(item, News.class);
                         for (News tmp : list
                                 ) {
@@ -216,7 +213,6 @@ public class ApiUrils {
     private static void getDataMV(final Queue<Integer> myQueue) {
         try {
             int page = myQueue.poll();
-            //XUtil.tShort(Constant.SYS_MEIVI + "-正在下载，第" + page + "页");
             RequestQueue mVolleyQueue = Volley.newRequestQueue(MyApplication.getInstance().ctx);
             String url = "http://apis.baidu.com/txapi/mvtp/meinv?num=12";
             MyStringRequest myStringRequest = new MyStringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -226,7 +222,6 @@ public class ApiUrils {
                         String ret = response.toString();
                         for (int i = 0; i < 10; i++) {
                             org.json.JSONObject obj = new org.json.JSONObject(ret);
-                            XUtil.debug("ret==>" + ret);
                             String item = obj.getString(i + "");
                             WxHot tmp = JSON.parseObject(item, WxHot.class);
                             ArrayList<String> strs = new ArrayList<>();
@@ -278,11 +273,9 @@ public class ApiUrils {
                 public void onResponse(String response) {
                     try {
                         String ret = response.toString();
-                        XUtil.debug("ret=" + ret);
                         org.json.JSONObject obj = new org.json.JSONObject(ret);
                         String item = obj.getString("showapi_res_body");
                         item = new org.json.JSONObject(item).getString("contentlist");
-                        XUtil.debug("item=" + item);
                         ArrayList<Joke> list = (ArrayList<Joke>) JSON.parseArray(item, Joke.class);
                         for (Joke tmp : list
                                 ) {
@@ -384,7 +377,6 @@ public class ApiUrils {
                         String mTitle = doc.title().toString();
                         mTitle = mTitle.replaceAll("_百度百科", "");
                         mConent = mConent.replaceAll("\\[.*?]", "").replaceAll("百科名片 ", "");
-                        XUtil.debug("mTitle:" + mTitle + "  mConent:" + mConent);
                         ArrayList<String> strs = new ArrayList<>();
                         if (XUtil.notEmptyOrNull(mConent)) {
                             strs.add(mTitle);
@@ -451,13 +443,9 @@ public class ApiUrils {
                                 if (i == 0) {
                                     _url = name;
                                 } else {
-//                                    items.add(name);
                                     map.put(_id, name);
                                     topItem = _id;
-
-
                                 }
-                                XUtil.debug("name===>>" + name);
                             }
                         }
 
@@ -467,15 +455,11 @@ public class ApiUrils {
                         if (_url.contains("[") && _url.contains("]")) {
                             preUrl = _url.substring(0, _url.indexOf("["));
                             endUrl = _url.substring(_url.lastIndexOf("]") + 1, _url.length());
-                            flag = true;
-                            XUtil.debug("preUrl::" + preUrl + " - " + endUrl);
                             url = preUrl + page + endUrl;
-                            XUtil.debug("realurl::" + url);
                         } else {
                             myQueue.removeAll(myQueue);
                         }
                         Document doc = Jsoup.connect(url).header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0").timeout(3000).get();
-//                        XUtil.debug("doc==>>"+doc.outerHtml());
                         ArrayList<String> dlist = new ArrayList<String>();
                         for (Integer in : map.keySet()) {
                             String elementsKey = map.get(in);
@@ -496,21 +480,11 @@ public class ApiUrils {
                                 Collections.reverse(elements);
                                 for (Element element : elements) {
                                     String _durl = element.select("a").attr("href");
-//                                    if (elementsKey.contains("img")) {
-//                                        _durl = element.attr("src");
-//                                    }
-
                                     int index = -1;
-
-                                    XUtil.debug("_durl==?" + _durl);
                                     if (XUtil.notEmptyOrNull(_durl) && _durl.startsWith("/")) {
                                         String base = doc.baseUri();
-//                                        String base = element.baseUri();
                                         if (XUtil.notEmptyOrNull(base) && base.endsWith("/")) {
                                             base = base.substring(0, base.length() - 1);
-
-
-
                                         }
                                         if (base.startsWith("http")) {
                                             index = base.indexOf('/', base.indexOf('/') + 2);
@@ -518,42 +492,12 @@ public class ApiUrils {
                                         } else {
                                             index = base.indexOf('/');
                                         }
-
                                         if (index != -1) {
                                             base = base.substring(0, index);
 
                                         }
-
-                                        XUtil.debug("base::" + base);
-
-//                                        String tmp = _durl.substring(0, _durl.lastIndexOf("/"));
-//                                        if (base.contains(tmp)) {
-//                                            _durl = base + _durl.substring(_durl.lastIndexOf("/") + 1, _durl.length());
-//
-//                                        } else {
-//
-//                                        }
                                         _durl = base + _durl;
-
-
                                     }
-//                                    if (elementsKey.contains("img")) {
-//                                        list.add(_durl);
-//                                    } else {
-//                                        list.add(element.text());
-//                                    }
-
-
-//                                    if (XUtil.isEmptyOrNull(element.text())) {
-//                                        String srcStr = element.attr("src");
-//                                        list.add(srcStr);
-//                                    } else {
-//
-//
-//
-//                                    }
-
-
                                     /**
                                      * 小于10个字符且li的舍弃
                                      */
@@ -563,11 +507,6 @@ public class ApiUrils {
                                         list.add(element.text());
                                         dlist.add(_durl);
                                     }
-
-//                                    XUtil.debug("---->>>" + element.text() + "  --- " + list);
-//                                    _durl = "http://www.topit.me/tag/%E5%A3%81%E7%BA%B8?p=" + new Random().nextInt();
-
-//                                    XUtil.debug("  " + element.html() + "-- " + _durl);
                                 }
                             } else {
                                 list.add(doc.html());
@@ -576,20 +515,16 @@ public class ApiUrils {
                             mapOut.put(in, list);
                         }
 
-                        XUtil.debug("map:::" + map);
-                        XUtil.debug("mapOut:::" + mapOut);
                         Map<String, Object> tmpMap;
 
                         for (Integer in : mapOut.keySet()) {
                             tmpMap = new HashMap<>();
-
                             ArrayList<String> list = new ArrayList<String>();
                             list = mapOut.get(in);
                             for (int i = 0; i < list.size(); i++) {
                                 String tmp = list.get(i);
                                 tmpMap.put(in + "", tmp);
                                 JSON json = new JSONObject(tmpMap);
-                                XUtil.debug("json:" + json + " " + tmpMap);
                                 if (map.size() > 0) {
                                     Items items = new Items(myLib.getLib_id(), json.toJSONString());
                                     try {
@@ -608,22 +543,6 @@ public class ApiUrils {
 
                         }
 
-
-//                        String url = "http://wapbaike.baidu.com/view/" + page + ".htm";
-//                        Document doc = Jsoup.connect(url).timeout(1000).get();
-//                        Elements elements = doc.getElementsByClass("summary-content");
-//                        String mConent = elements.text().toString();
-//                        String mTitle = doc.title().toString();
-//                        mTitle = mTitle.replaceAll("_百度百科", "");
-//                        mConent = mConent.replaceAll("\\[.*?]", "").replaceAll("百科名片 ", "");
-//                        XUtil.debug("mTitle:" + mTitle + "  mConent:" + mConent);
-//                        ArrayList<String> strs = new ArrayList<>();
-//                        if (XUtil.notEmptyOrNull(mConent)) {
-//                            strs.add(mTitle);
-//                            strs.add(mConent);
-//                            strs.add(url);
-//                        }
-//                        ShareAc.initSaveList(Constant.SYS_BAIDU_BK, Constant.SYS_BAIDU_BK_MK, strs);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -633,20 +552,13 @@ public class ApiUrils {
                 @Override
                 public void onSuccess(Context context, Boolean result) {
                     if (myQueue.isEmpty()) {
-
-//                        int pageNo = MySp.getapi_bdbk() + MySp.getapi_page();
-//                        MySp.setapi_bdbk(pageNo);
-//                        XUtil.tShort(Constant.SYS_BAIDU_BK + "-" + XUtil.getDateFull());
                         myLib.setLib_exi2(myLib.getLib_exi2() + MySp.getapi_page());
                         Dbutils.updateLib(myLib);
-
-
                         if (topItem != 0) {
                             Map<String, Object> map = new HashMap<>();
                             map.put(String.valueOf(topItem), XUtil.getDateFullSec());
                             Dbutils.addItems(new Items(myLib.getLib_id(), new JSONObject(map).toJSONString()));
                         }
-//                        Dbutils.addItems(new Items(myLib.getLib_id(), "2017年1月9日"));
                         EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
                     } else {
                         getDataJsoup(myQueue);

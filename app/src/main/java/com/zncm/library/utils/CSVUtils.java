@@ -87,7 +87,6 @@ public class CSVUtils {
                     Charset.forName(charset));
             // 逐条读取记录，直至读完
             while (r.readRecord()) {
-                XUtil.debug("importCsv:" + r.getRawRecord());
                 // 读取一条记录
                 dataList.add(r.getRawRecord());
             }
@@ -114,7 +113,6 @@ public class CSVUtils {
             }
 
             while (r.readRecord()) {
-                XUtil.debug("getRawRecord:" + r.getRawRecord());
                 // 读取一条记录
                 dataList.add(r.getRawRecord());
             }

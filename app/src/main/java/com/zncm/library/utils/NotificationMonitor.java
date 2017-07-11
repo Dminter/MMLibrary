@@ -121,7 +121,6 @@ public class NotificationMonitor extends NotificationListenerService {
             if (notificationText != null) {
                 content = notificationText.toString().trim();
             }
-            XUtil.debug("content:" + content);
             if (isListenNotify && XUtil.notEmptyOrNull(content)) {
                 boolean flag = false;
                 String nKey = MySp.get(SpConstant.notifyKey, String.class, "");

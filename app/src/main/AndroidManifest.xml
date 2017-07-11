@@ -1,43 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.zncm.library"
-    android:installLocation="auto">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.zncm.library"
+          android:installLocation="auto">
 
 
-    <uses-sdk tools:overrideLibrary="com.shuyu.gsyvideoplayer" />
+    <uses-sdk tools:overrideLibrary="com.shuyu.gsyvideoplayer"/>
 
     <application
-        android:name=".data.MyApplication"
-        android:allowBackup="true"
-        android:icon="@drawable/ic_lib"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+            android:name=".data.MyApplication"
+            android:allowBackup="true"
+            android:icon="@drawable/ic_lib"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
+                android:name=".MainActivity"
+                android:theme="@style/MainTheme"
+                android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LibAddAc" />
-        <activity android:name=".ui.LibAc" />
-        <activity android:name=".ui.ItemsAddAc" />
-        <activity android:name=".ui.QRActivity" />
+        <activity android:name=".ui.LibAddAc"/>
+        <activity android:name=".ui.LibAc"/>
+        <activity android:name=".ui.ItemsAddAc"/>
+        <activity android:name=".ui.QRActivity"/>
 
         <activity
-            android:name=".ui.SettingActivity"
-            android:label="设置"
-            android:launchMode="singleInstance"
-            android:theme="@style/MyMaterialSettings"></activity>
+                android:name=".ui.SettingActivity"
+                android:label="设置"
+                android:launchMode="singleInstance"
+                android:theme="@style/MyMaterialSettings"></activity>
         <activity
-            android:name=".ui.ItemsDetailsAc"
-            android:theme="@style/MainTheme" />
-        <activity android:name=".ui.ShowInfoActivity" />
-        <activity android:name=".ui.LikeActivity" />
-        <activity android:name=".ui.ItemsAc">
+                android:name=".ui.ItemsDetailsAc"
+                android:theme="@style/MainTheme"/>
+        <activity android:name=".ui.ShowInfoActivity"/>
+        <activity android:name=".ui.LikeActivity"/>
+        <activity
+                android:name=".ui.ItemsAc"
+                android:label="快捷方式"
+        >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+            </intent-filter>
 
         </activity>
         <activity android:name=".ui.ShareAc">
@@ -52,75 +60,79 @@
 
         </activity>
 
-        <activity android:name=".ui.FieldsAddAc" />
+        <activity android:name=".ui.FieldsAddAc"/>
         <activity
-            android:name=".ui.HomeTabActivity"
-            android:theme="@style/MainTheme"
-            android:windowSoftInputMode="adjustPan" />
+                android:name=".ui.HomeTabActivity"
+                android:theme="@style/MainTheme"
+                android:windowSoftInputMode="adjustPan"/>
         <activity
-            android:name=".ui.TabMyLibActivity"
-            android:theme="@style/MainTheme">
+                android:name=".ui.TabMyLibActivity"
+                android:theme="@style/MainTheme">
             <intent-filter android:label="发送到我的库">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
-                <data android:mimeType="text/*" />
-                <data android:mimeType="application/csv" />
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="text/*"/>
+                <data android:mimeType="application/csv"/>
             </intent-filter>
         </activity>
 
 
-        <activity android:name=".ui.TabSettingAc" />
-        <activity android:name=".ui.OptionsAc" />
-        <activity android:name=".ui.WebViewActivity" />
-        <activity android:name=".ui.TabLibActivity" />
-        <activity android:name=".ui.LocLibAc" />
-        <activity android:name=".ui.PhotoAc" />
-        <activity android:name=".ui.ApiAc" />
-        <activity android:name=".ui.PlayActivity" />
+        <activity android:name=".ui.TabSettingAc"/>
+        <activity android:name=".ui.OptionsAc"/>
+        <activity android:name=".ui.WebViewActivity"/>
+        <activity android:name=".ui.TabLibActivity"/>
+        <activity android:name=".ui.LocLibAc"/>
+        <activity android:name=".ui.PhotoAc"/>
+        <activity android:name=".ui.ApiAc"/>
         <activity
-            android:name=".ui.SettingAc"
-            android:theme="@style/SettingTheme" />
+                android:name=".ui.SettingAc"
+                android:theme="@style/SettingTheme"/>
         <activity
-            android:name="com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label=""
-            android:theme="@style/ImageGalleryTheme" />
+                android:name="com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:label=""
+                android:theme="@style/ImageGalleryTheme"/>
 
         <service
-            android:name=".utils.NotificationMonitor"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+                android:name=".utils.NotificationMonitor"
+                android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService" />
+                <action android:name="android.service.notification.NotificationListenerService"/>
             </intent-filter>
         </service>
         <service
-            android:name=".utils.ActionService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+                android:name=".utils.ActionService"
+                android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
             </intent-filter>
             <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessible_service_config" />
+                    android:name="android.accessibilityservice"
+                    android:resource="@xml/accessible_service_config"/>
         </service>
 
         <meta-data
-            android:name="BUG_HD_SDK_GENERAL_KEY"
-            android:value="a97268acf20fbac773a5a5362956acf2" />
+                android:name="BUG_HD_SDK_GENERAL_KEY"
+                android:value="a97268acf20fbac773a5a5362956acf2"/>
 
 
         <meta-data
-            android:name="UMENG_APPKEY"
-            android:value="561e17bee0f55a6e530045d8"></meta-data>
+                android:name="UMENG_APPKEY"
+                android:value="561e17bee0f55a6e530045d8"></meta-data>
         <meta-data
-            android:name="UMENG_CHANNEL"
-            android:value="UM" />
+                android:name="UMENG_CHANNEL"
+                android:value="UM"/>
 
     </application>
-
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 添加快捷方式 -->
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <!-- 移除快捷方式 -->
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"/>
+    <!-- 查询快捷方式 -->
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
@@ -131,7 +143,7 @@
     <uses-permission android:name="android.permission.READ_SMS"></uses-permission>
 
 
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
 </manifest>

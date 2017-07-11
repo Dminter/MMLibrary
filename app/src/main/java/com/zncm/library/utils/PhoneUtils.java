@@ -33,7 +33,6 @@ public class PhoneUtils {
                 int smsColumn = cursor.getColumnIndex("body");
                 String number = cursor.getString(phoneColumn);
                 String content = cursor.getString(smsColumn);
-                XUtil.debug("msg=>" + number + " " + content);
                 if (XUtil.notEmptyOrNull(content)) {
                     ShareAc.initSave(Constant.SYS_SMS, content, number);
                 }
@@ -53,7 +52,6 @@ public class PhoneUtils {
             while (cursor.moveToNext()) {
                 String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                XUtil.debug("info:" + name + "" + number);
                 if (XUtil.notEmptyOrNull(name)) {
                     ShareAc.initSave(Constant.SYS_CONTECT, number, name);
                 }
@@ -80,7 +78,6 @@ public class PhoneUtils {
             String name = cursor.getString(1);
             int times = cursor.getInt(4);
             long time = cursor.getLong(5);
-            XUtil.debug("info:" + name);
             if (XUtil.notEmptyOrNull(name)) {
                 ShareAc.initSave(Constant.SYS_CONTECT_NEAR, XUtil.getDateFull(time) + " (" + times + ")", name);
             }
@@ -109,7 +106,6 @@ public class PhoneUtils {
         for (int i = 0; i < list.size(); i++) {
             sb.append(list.get(i).SSID).append(" ");
         }
-        XUtil.debug("info:" + infoStr + " " + list);
         if (XUtil.notEmptyOrNull(infoStr)) {
             ShareAc.initSave(Constant.SYS_WIFI, infoStr + " \n其他wifi:" + sb.toString(), ssid);
         }

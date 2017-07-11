@@ -169,7 +169,6 @@ public class TabMyLibActivity extends BaseAc {
     public void onEvent(RefreshEvent event) {
         int type = event.type;
         if (type == EnumData.RefreshEnum.LIB.getValue()) {
-            XUtil.debug("Refresh LIb...");
             libFt.onRefresh();
         }
     }

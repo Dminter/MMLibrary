@@ -19,21 +19,15 @@ public class Constant {
     public static String KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION";
     public static String KEY_TITLE = "KEY_TITLE";
     public static String PATH_ROOT = "LIB/" + MyApplication.getInstance().ctx.getPackageName();
-    //    public static String LIB_SHARE = "http://share.weiyun.com/fbd1f07b97d9890a8923032988c8905b";
     public static String LIB_SHARE = "http://pan.baidu.com/s/1mg1r620";
     public static String LOCLIB_NET = "http://pan.plyz.net/d.asp?u=456079979&p=loclib_net.csv";
     public static String LIB_SHARE_TMPLIB = "http://pan.plyz.net/d.asp?u=3356364438";
     public static String QQ_GROUP = "153039365";
     public static String QQ_GROUP_URL = "http://jq.qq.com/?_wv=1027&k=dV1lAA";
-
-
     public static String SHARE_URL = "http://fir.im/lib/";
     public static String QQ_LIB_SHARE = "1603638739";
-
     public static String PRE_LIB = "@N";
     public static String NET_DIV = "@";
-
-
     public static String SYS_SHARE = "分享";
     public static String SYS_CLIPBOARD = "剪贴板";
     public static String SYS_NOTIFY = "通知栏";
@@ -88,7 +82,6 @@ public class Constant {
 
     public static String SYS_QR = "二维码";
     public static String SYS_QR_MK = "扫描结果:文本||时间:文本";
-//    public static String SYS_NET_MK = "标题:文本||时间:文本||来源:文本";
 
 
 }
