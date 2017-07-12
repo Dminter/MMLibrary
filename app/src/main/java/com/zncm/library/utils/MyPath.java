@@ -10,6 +10,7 @@ import java.io.File;
 public class MyPath {
     public static final String PATH_IMG = "img";
     public static final String PATH_DATA = "data";
+    public static final String PATH_CACHE= "cache";
     public static final String PATH_DB = "db";
     public static final String PATH_DOWNLOAD = "download";
 
@@ -44,6 +45,9 @@ public class MyPath {
 
     public static String getPathDb() {
         return getPathFolder(PATH_DB);
+    }
+    public static String getPathCache() {
+        return getPathFolder(PATH_CACHE);
     }
 
     public static String getPathDownload() {
