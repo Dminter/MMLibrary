@@ -17,7 +17,7 @@ import com.zncm.library.data.Constant;
 import com.zncm.library.data.DetailInfo;
 import com.zncm.library.data.Info;
 import com.zncm.library.data.MyApplication;
-import com.zncm.library.ui.LikeActivity;
+import com.zncm.library.ui.InfoDetailsActivity;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
@@ -35,24 +35,28 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class LikeFragment extends BaseListFragment {
+public class InfoDetailsFragment extends BaseListFragment {
     private DetailsAdapter mAdapter;
-    private LikeActivity ctx;
+    private InfoDetailsActivity ctx;
     private boolean onLoading = false;
     DetailInfo info;
     ArrayList<Info> list = new ArrayList<>();
     Set<String> imgUrls = new HashSet<>();
     String content;
+    private boolean isPhoto = true;
 
     //    MaterialEditText editText;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        ctx = (LikeActivity) getActivity();
+        ctx = (InfoDetailsActivity) getActivity();
 
         Serializable dataParam = ctx.getIntent().getSerializableExtra(Constant.KEY_PARAM_DATA);
         if (dataParam != null && dataParam instanceof DetailInfo) {
             info = (DetailInfo) dataParam;
+            if (info!=null){
+                ctx.info = info;
+            }
         }
 
         ctx.myTitle(info.getTitle());
@@ -97,6 +101,9 @@ public class LikeFragment extends BaseListFragment {
 
 
                         } else {
+                            if (!isPhoto) {
+                                return;
+                            }
                             Intent intent = new Intent(ctx, PhotoAc.class);
                             intent.putExtra("url", list.get(position).getImg());
                             startActivity(intent);
@@ -139,7 +146,7 @@ public class LikeFragment extends BaseListFragment {
     }
 
 
-    private void getData(boolean bFirst) {
+    public void getData(boolean bFirst) {
         GetData getData = new GetData();
         getData.execute(bFirst);
     }
@@ -182,7 +189,7 @@ public class LikeFragment extends BaseListFragment {
                             }
                             _durl = base + _durl;
                         }
-                        if (elementsKey.contains("img") && imgUrls.add(_durl)&&!_durl.endsWith(".gif")) {
+                        if (elementsKey.contains("img") && imgUrls.add(_durl) && !_durl.endsWith(".gif")) {
                             tmp.setImg(_durl);
                             list.add(tmp);
                         }
@@ -210,6 +217,7 @@ public class LikeFragment extends BaseListFragment {
                 list = new ArrayList<>();
                 listView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
                 list.add(new Info("", "", content));
+                boolean isPhoto = false;
             }
 
 

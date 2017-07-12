@@ -37,7 +37,7 @@
                 android:name=".ui.ItemsDetailsAc"
                 android:theme="@style/MainTheme"/>
         <activity android:name=".ui.ShowInfoActivity"/>
-        <activity android:name=".ui.LikeActivity"/>
+        <activity android:name=".ui.InfoDetailsActivity"/>
         <activity
                 android:name=".ui.ItemsAc"
                 android:label="快捷方式"

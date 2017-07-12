@@ -401,6 +401,20 @@ public class Dbutils {
     }
 
 
+
+    public static void deleteLibItems(int lib_id) {
+        init();
+        try {
+            DeleteBuilder db2 = itemsDao.deleteBuilder();
+            db2.where().eq("lib_id", lib_id);
+            db2.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public static void updateFields(Fields fields) {
         init();
         try {

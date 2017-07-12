@@ -56,7 +56,7 @@ import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
 import com.zncm.library.ui.LibAddAc;
-import com.zncm.library.ui.LikeActivity;
+import com.zncm.library.ui.InfoDetailsActivity;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.WebViewActivity;
@@ -257,6 +257,12 @@ public class ItemsFt extends BaseListFt {
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                                 int curPosition = position - listView.getHeaderViewsCount();
+                                                Items item = datas.get(curPosition);
+                                                item.setItem_exb1(true);
+                                                datas.set(curPosition,item);
+                                                mAdapter.setItems(datas);
+
+
 
 
                                                 if (XUtil.notEmptyOrNull(query)) {
@@ -279,7 +285,6 @@ public class ItemsFt extends BaseListFt {
                                                         if (lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value()
                                                                 || lib.getLib_exi1() == Lib.libType.api.value()) {
                                                             if (XUtil.notEmptyOrNull(tmp.getItem_exs1())) {
-
                                                                 flag = true;
                                                             }
                                                         }
@@ -290,7 +295,7 @@ public class ItemsFt extends BaseListFt {
                                                          */
                                                         Dbutils.readItems(tmp.getItem_id(), true);
                                                         if (lib.isLib_exb2()) {
-                                                            Intent intent = new Intent(ctx, LikeActivity.class);
+                                                            Intent intent = new Intent(ctx, InfoDetailsActivity.class);
                                                             intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img", XUtil.getChinese(tmp.getItem_json())));
                                                             startActivity(intent);
                                                         } else {
@@ -717,6 +722,7 @@ public class ItemsFt extends BaseListFt {
             }
         }
         sub.add(0, 11, 0, "发送到桌面");
+        sub.add(0, 12, 0, "清除库内容");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
@@ -864,6 +870,21 @@ public class ItemsFt extends BaseListFt {
 
             case 11:
                 XUtil.sendToDesktop(ctx, lib);
+                break;
+            case 12:
+                new MaterialDialog.Builder(ctx)
+                        .title("清除库内容")
+                        .content("确认清除库内容？")
+                        .positiveText("清除")
+                        .negativeText("取消")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                Dbutils.deleteLibItems(lib.getLib_id());
+                                refresh();
+                            }
+                        }).show();
                 break;
         }
 
