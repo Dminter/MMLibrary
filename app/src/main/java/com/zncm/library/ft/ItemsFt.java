@@ -197,31 +197,31 @@ public class ItemsFt extends BaseListFt {
                     holder.tvContent.setVisibility(View.GONE);
                 }
                 if (XUtil.notEmptyOrNull(picUrl)) {
-                    holder.ivIcon.setVisibility(View.VISIBLE);
-                    MyApplication.imageLoader.displayImage(picUrl,
-                            holder.ivIcon, new SimpleImageLoadingListener() {
-                                @Override
-                                public void onLoadingStarted(String imageUri, View view) {
-                                    holder.ivIcon.setImageResource(R.drawable.ic_lib);
-                                    super.onLoadingStarted(imageUri, view);
-                                }
-                            });
-                    final String finalPicUrl = picUrl;
-                    holder.ivIcon.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(ctx, PhotoAc.class);
-                            intent.putExtra("url", finalPicUrl);
-                            startActivity(intent);
-                        }
-                    });
+//                    holder.ivIcon.setVisibility(View.VISIBLE);
+//                    MyApplication.imageLoader.displayImage(picUrl,
+//                            holder.ivIcon, new SimpleImageLoadingListener() {
+//                                @Override
+//                                public void onLoadingStarted(String imageUri, View view) {
+//                                    holder.ivIcon.setImageResource(R.drawable.ic_lib);
+//                                    super.onLoadingStarted(imageUri, view);
+//                                }
+//                            });
+//                    final String finalPicUrl = picUrl;
+//                    holder.ivIcon.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            Intent intent = new Intent(ctx, PhotoAc.class);
+//                            intent.putExtra("url", finalPicUrl);
+//                            startActivity(intent);
+//                        }
+//                    });
                 } else if (XUtil.notEmptyOrNull(title)) {
-                    holder.ivIcon.setVisibility(View.VISIBLE);
-                    TextDrawable drawable = TextDrawable.builder()
-                            .buildRect(title.substring(0, 1), mColorGenerator.getColor(title.substring(0, 1)));
-                    holder.ivIcon.setImageDrawable(drawable);
+//                    holder.ivIcon.setVisibility(View.VISIBLE);
+//                    TextDrawable drawable = TextDrawable.builder()
+//                            .buildRect(title.substring(0, 1), mColorGenerator.getColor(title.substring(0, 1)));
+//                    holder.ivIcon.setImageDrawable(drawable);
                 } else {
-                    holder.ivIcon.setVisibility(View.GONE);
+//                    holder.ivIcon.setVisibility(View.GONE);
                 }
 
 
@@ -441,7 +441,7 @@ public class ItemsFt extends BaseListFt {
 
 
     @Override
-    public void onRefresh() {
+    public void onRefresh2() {
         query = "";
         if (onLoading) {
             return;
@@ -451,7 +451,6 @@ public class ItemsFt extends BaseListFt {
 
     private void refresh() {
         onLoading = true;
-        swipeLayout.setRefreshing(true);
         datas = new ArrayList<>();
         getData();
     }
@@ -630,7 +629,7 @@ public class ItemsFt extends BaseListFt {
     }
 
     @Override
-    public void onLoadMore() {
+    public void onLoadMore2() {
         getData();
     }
 

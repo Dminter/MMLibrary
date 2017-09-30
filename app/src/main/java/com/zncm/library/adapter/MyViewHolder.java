@@ -1,5 +1,6 @@
 package com.zncm.library.adapter;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +17,7 @@ public class MyViewHolder extends RecyclerView.ViewHolder {
     public ImageView tvIcon;
     public ImageView ivIcon;
     public IconTextView operate;
-    public RelativeLayout rlBg;
+    public CardView mCardView;
     public Button btn;
 
     public MyViewHolder(View itemView) {
@@ -28,7 +29,7 @@ public class MyViewHolder extends RecyclerView.ViewHolder {
             tvIcon = (ImageView) itemView.findViewById(R.id.tvIcon);
             operate = (IconTextView) itemView.findViewById(R.id.operate);
             btn = (Button) itemView.findViewById(R.id.btn);
-            rlBg = (RelativeLayout) itemView.findViewById(R.id.rlBg);
+            mCardView = (CardView) itemView.findViewById(R.id.mCardView);
         }
     }
 }

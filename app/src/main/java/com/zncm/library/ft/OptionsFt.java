@@ -178,7 +178,7 @@ public class OptionsFt extends BaseListFt {
 
 
     @Override
-    public void onRefresh() {
+    public void onRefresh2() {
         if (onLoading) {
             return;
         }
@@ -187,13 +187,12 @@ public class OptionsFt extends BaseListFt {
 
     private void refresh() {
         onLoading = true;
-        swipeLayout.setRefreshing(true);
         getData();
     }
 
 
     @Override
-    public void onLoadMore() {
+    public void onLoadMore2() {
         getData();
     }
 

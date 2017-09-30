@@ -27,6 +27,7 @@ import com.zncm.library.ui.LibAc;
 import com.zncm.library.ui.LibAddAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.utils.Dbutils;
+import com.zncm.library.utils.OnRefreshListener;
 import com.zncm.library.utils.XUtil;
 
 import de.greenrobot.event.EventBus;
@@ -37,7 +38,7 @@ import java.util.List;
 import tr.xip.errorview.RetryListener;
 
 
-public class LibFt extends BaseListFt {
+public class LibFt extends BaseListFt implements OnRefreshListener {
     private LibAdapter mAdapter;
     private Activity ctx;
     private List<Lib> datas = null;
@@ -81,35 +82,35 @@ public class LibFt extends BaseListFt {
                 if (XUtil.notEmptyOrNull(data.getLib_name())) {
                     holder.tvTitle.setVisibility(View.VISIBLE);
                     holder.tvTitle.setText(data.getLib_name());
-                    holder.ivIcon.setVisibility(View.VISIBLE);
-                    TextDrawable drawable = null;
-                    if (data.getLib_exi1() == Lib.libType.net.value()) {
-                        drawable = TextDrawable.builder()
-                                .buildRect("NET", mColorGenerator.getColor(data.getLib_name()));
-                    } else if (data.getLib_exi1() == Lib.libType.sys.value()) {
-                        drawable = TextDrawable.builder()
-                                .buildRect("SYS", mColorGenerator.getColor(data.getLib_name()));
-                    } else if (data.getLib_exi1() == Lib.libType.rss.value()) {
-                        drawable = TextDrawable.builder()
-                                .buildRect("RSS", mColorGenerator.getColor(data.getLib_name()));
-                    } else if (data.getLib_exi1() == Lib.libType.api.value()) {
-                        drawable = TextDrawable.builder()
-                                .buildRect("API", mColorGenerator.getColor(data.getLib_name()));
-                    } else {
-                        drawable = TextDrawable.builder()
-                                .buildRect(data.getLib_name().substring(0, 1), mColorGenerator.getColor(data.getLib_name()));
-                    }
-                    holder.ivIcon.setImageDrawable(drawable);
+//                    holder.ivIcon.setVisibility(View.VISIBLE);
+//                    TextDrawable drawable = null;
+//                    if (data.getLib_exi1() == Lib.libType.net.value()) {
+//                        drawable = TextDrawable.builder()
+//                                .buildRect("NET", mColorGenerator.getColor(data.getLib_name()));
+//                    } else if (data.getLib_exi1() == Lib.libType.sys.value()) {
+//                        drawable = TextDrawable.builder()
+//                                .buildRect("SYS", mColorGenerator.getColor(data.getLib_name()));
+//                    } else if (data.getLib_exi1() == Lib.libType.rss.value()) {
+//                        drawable = TextDrawable.builder()
+//                                .buildRect("RSS", mColorGenerator.getColor(data.getLib_name()));
+//                    } else if (data.getLib_exi1() == Lib.libType.api.value()) {
+//                        drawable = TextDrawable.builder()
+//                                .buildRect("API", mColorGenerator.getColor(data.getLib_name()));
+//                    } else {
+//                        drawable = TextDrawable.builder()
+//                                .buildRect(data.getLib_name().substring(0, 1), mColorGenerator.getColor(data.getLib_name()));
+//                    }
+//                    holder.ivIcon.setImageDrawable(drawable);
                 } else {
                     holder.tvTitle.setVisibility(View.GONE);
-                    holder.ivIcon.setVisibility(View.GONE);
+//                    holder.ivIcon.setVisibility(View.GONE);
                 }
                 holder.tvContent.setVisibility(View.GONE);
-                if (data.getLib_color() > 0) {
-                    holder.rlBg.setBackgroundResource(R.drawable.card_dark);
-                } else {
-                    holder.rlBg.setBackgroundResource(R.drawable.card);
-                }
+//                if (data.getLib_color() > 0) {
+//                    holder.mCardView.setBackgroundResource(R.drawable.card_dark);
+//                } else {
+//                    holder.mCardView.setBackgroundResource(R.drawable.card);
+//                }
             }
 
             @Override
@@ -580,7 +581,7 @@ public class LibFt extends BaseListFt {
 //    }
 
     @Override
-    public void onRefresh() {
+    public void onRefresh2() {
         query = "";
         if (onLoading) {
             return;
@@ -591,13 +592,12 @@ public class LibFt extends BaseListFt {
     private void refresh() {
         datas = new ArrayList<>();
         onLoading = true;
-        swipeLayout.setRefreshing(true);
         getData();
     }
 
 
     @Override
-    public void onLoadMore() {
+    public void onLoadMore2() {
         getData();
     }
 

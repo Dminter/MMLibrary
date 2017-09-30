@@ -166,7 +166,8 @@ public class LocLibFt extends BaseListFt {
 
 
         if (mCtx != null) {
-            swipeLayout.setEnabled(false);
+            refreshLayout.setEnableLoadmore(false);
+            refreshLayout.setEnableRefresh(false);
         }
 
 
@@ -358,7 +359,7 @@ public class LocLibFt extends BaseListFt {
     }
 
     @Override
-    public void onRefresh() {
+    public void onRefresh2() {
 
         query = "";
         if (onLoading) {
@@ -370,13 +371,12 @@ public class LocLibFt extends BaseListFt {
     private void refresh() {
         datas = new ArrayList<>();
         onLoading = true;
-        swipeLayout.setRefreshing(true);
         getData();
     }
 
 
     @Override
-    public void onLoadMore() {
+    public void onLoadMore2() {
         getData();
     }
 

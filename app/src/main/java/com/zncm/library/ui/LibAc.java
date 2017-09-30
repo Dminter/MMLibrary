@@ -36,7 +36,7 @@ public class LibAc extends BaseAc {
     public void onEvent(RefreshEvent event) {
         int type = event.type;
         if (type == EnumData.RefreshEnum.LIB.getValue()) {
-            libFt.onRefresh();
+            libFt.onRefresh2();
         }
     }
 
