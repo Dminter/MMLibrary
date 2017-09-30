@@ -198,7 +198,7 @@ public class MySp extends MySharedPreferences {
     }
 
     public static Integer getTheme() {
-        return getInt(getSharedPreferences(), Key.theme.toString(), -16744450);
+        return getInt(getSharedPreferences(), Key.theme.toString(), Integer.parseInt("#4E342E"));
     }
 
     public static void setTemplateVersion(Integer template_version) {

@@ -176,11 +176,11 @@ public class XUtil {
         Map<String, String> mRssMap = new LinkedHashMap<String, String>();
         mRssMap.put("cnBeta", "http://rss.cnbeta.com/rss");
 //        mRssMap.put("知乎日报", "http://www.zhihu.com/rss");
-        mRssMap.put("IT之家", "http://www.ithome.com/rss/");
+//        mRssMap.put("IT之家", "http://www.ithome.com/rss/");
         mRssMap.put("小众软件", "http://www.appinn.com/feed/ ");
         mRssMap.put("凤凰网", "http://news.ifeng.com/rss/index.xml ");
-        mRssMap.put("人民网-国内新闻", "http://www.people.com.cn/rss/politics.xml");
-        mRssMap.put("人民网-国际新闻", "http://www.people.com.cn/rss/world.xml");
+//        mRssMap.put("人民网-国内新闻", "http://www.people.com.cn/rss/politics.xml");
+//        mRssMap.put("人民网-国际新闻", "http://www.people.com.cn/rss/world.xml");
         List<Lib> netLib = Dbutils.getLibPage(null, 0, Lib.libType.rss.value());
         if (!XUtil.listNotNull(netLib)) {
             for (String key : mRssMap.keySet()) {
@@ -196,10 +196,10 @@ public class XUtil {
     public static void initNetLib() {
         Map<String, String> mRssMap = new LinkedHashMap<String, String>();
 //        mRssMap.put(Constant.SYS_WXHOT, Constant.SYS_WXHOT_MK);
-        mRssMap.put(Constant.SYS_NEWS, Constant.SYS_NEWS_MK);
+//        mRssMap.put(Constant.SYS_NEWS, Constant.SYS_NEWS_MK);
 //        mRssMap.put(Constant.SYS_MEIVI, Constant.SYS_MEIVI_MK);
-        mRssMap.put(Constant.SYS_XH, Constant.SYS_XH_MK);
-        mRssMap.put(Constant.SYS_XH_PIC, Constant.SYS_XH_PIC_MK);
+//        mRssMap.put(Constant.SYS_XH, Constant.SYS_XH_MK);
+//        mRssMap.put(Constant.SYS_XH_PIC, Constant.SYS_XH_PIC_MK);
         mRssMap.put(Constant.SYS_BAIDU_BK, Constant.SYS_BAIDU_BK_MK);
         List<Lib> netLib = Dbutils.getLibPage(null, 0, Lib.libType.net.value());
         if (!XUtil.listNotNull(netLib)) {

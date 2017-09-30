@@ -63,7 +63,7 @@ public class ItemsAc extends BaseAc {
     public void onEvent(RefreshEvent event) {
         int type = event.type;
         if (type == EnumData.RefreshEnum.ITEMS.getValue()) {
-            itemsFt.onRefresh();
+            itemsFt.onRefresh2();
         }
     }
 
