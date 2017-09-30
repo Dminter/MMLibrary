@@ -1,24 +1,20 @@
 package com.zncm.library.adapter;
 
 import android.content.Context;
-import android.media.Image;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.malinskiy.materialicons.widget.IconTextView;
 import com.zncm.library.R;
 import com.zncm.library.data.BaseData;
+import com.zncm.library.utils.XUtil;
 
 import java.util.List;
 
-public abstract class LibAdapter extends BaseAdapter {
+public abstract class LibAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
+    MyViewHolder holder;
     private List<? extends BaseData> items;
     private Context ctx;
 
@@ -31,63 +27,104 @@ public abstract class LibAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void setItems(List<? extends BaseData> items, RecyclerView mRecyclerView) {
+        this.items = items;
+        notifyDataSetChanged();
+        mRecyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+
+//    @Override
+//    public int getCount() {
+//        if (items != null) {
+//            return items.size();
+//        }
+//        return 0;
+//    }
+//
+//    @Override
+//    public Object getItem(int position) {
+//        if (items != null) {
+//            return items.get(position);
+//        }
+//        return null;
+//    }
+//
+//    @Override
+//    public long getItemId(int position) {
+//        if (items != null) {
+//            return position;
+//        } else {
+//            return 0;
+//        }
+//    }
+//
+//    @Override
+//    public View getView(int position, View itemView, ViewGroup parent) {
+//        MyViewHolder holder;
+//        if (itemView == null) {
+//            itemView = LayoutInflater.from(ctx).inflate(
+//                    R.layout.cell_item, null);
+//            holder = new MyViewHolder();
+//            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+//            ivIcon = (ImageView) itemView.findViewById(R.id.ivIcon);
+//            tvContent = (TextView) itemView.findViewById(R.id.tvContent);
+//            tvIcon = (ImageView) itemView.findViewById(R.id.tvIcon);
+//            operate = (IconTextView) itemView.findViewById(R.id.operate);
+//            btn = (Button) itemView.findViewById(R.id.btn);
+//            rlBg = (RelativeLayout) itemView.findViewById(R.id.rlBg);
+//            itemView.setTag(holder);
+//        } else {
+//            holder = (MyViewHolder) itemView.getTag();
+//        }
+//        setData(position, holder);
+//
+//        return itemView;
+//    }
+
+
     @Override
-    public int getCount() {
-        if (items != null) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cell_item, parent, false);
+        holder = new MyViewHolder(view);
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        holder.rlBg.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                OnItemLongClickListener(position, holder);
+                return true;
+            }
+        });
+        holder.rlBg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OnItemClickListener(position, holder);
+            }
+        });
+        setData(position, holder);
+    }
+
+    @Override
+    public int getItemCount() {
+        if (XUtil.listNotNull(items)) {
             return items.size();
-        }
-        return 0;
-    }
-
-    @Override
-    public Object getItem(int position) {
-        if (items != null) {
-            return items.get(position);
-        }
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        if (items != null) {
-            return position;
         } else {
             return 0;
         }
-    }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        MyViewHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(ctx).inflate(
-                    R.layout.cell_item, null);
-            holder = new MyViewHolder();
-            holder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
-            holder.ivIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
-            holder.tvContent = (TextView) convertView.findViewById(R.id.tvContent);
-            holder.tvIcon = (ImageView) convertView.findViewById(R.id.tvIcon);
-            holder.operate = (IconTextView) convertView.findViewById(R.id.operate);
-            holder.btn = (Button) convertView.findViewById(R.id.btn);
-            holder.rlBg = (RelativeLayout) convertView.findViewById(R.id.rlBg);
-            convertView.setTag(holder);
-        } else {
-            holder = (MyViewHolder) convertView.getTag();
-        }
-        setData(position, holder);
-
-        return convertView;
     }
 
     public abstract void setData(int position, MyViewHolder holder);
 
-    public class MyViewHolder {
-        public TextView tvTitle;
-        public TextView tvContent;
-        public ImageView tvIcon;
-        public ImageView ivIcon;
-        public IconTextView operate;
-        public RelativeLayout rlBg;
-        public Button btn;
-    }
+    public abstract void OnItemLongClickListener(int position, MyViewHolder holder);
+
+    public abstract void OnItemClickListener(int position, MyViewHolder holder);
+
+
 }
+
+

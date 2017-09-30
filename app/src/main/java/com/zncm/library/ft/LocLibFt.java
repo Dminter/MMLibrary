@@ -22,6 +22,7 @@ import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.adapter.MyViewHolder;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Fields;
@@ -118,65 +119,18 @@ public class LocLibFt extends BaseListFt {
                 });
             }
 
+            @Override
+            public void OnItemLongClickListener(int position, MyViewHolder holder) {
+                itemLongClick(position);
+            }
+
+            @Override
+            public void OnItemClickListener(int position, MyViewHolder holder) {
+                itemClick(position);
+            }
+
         };
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LocLib data = datas.get(position);
-                if (data == null) {
-                    return;
-                }
-                String content = data.getLoc_content();
-                content = content.replaceAll("\\|\\|", "\n").replaceAll(":", "").replaceAll("\\[", "").replaceAll("\\]", "");
-                content = content.replaceAll("文本", " ").replaceAll("整数", " ").replaceAll("实数", " ").replaceAll("布尔", " ").replaceAll("日期/时间", " ").replaceAll("日期", " ").replaceAll("时间", " ");
-                content = content.replaceAll("图像", " ").replaceAll("评级", " ").replaceAll("单选", " ").replaceAll("多选", " ");
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(data.getLoc_name()).append("\n");
-                stringBuffer.append(content).append("\n");
-                stringBuffer.append(data.getLoc_desc()).append("\n");
-                if (XUtil.notEmptyOrNull(stringBuffer.toString())) {
-                    new MaterialDialog.Builder(ctx)
-                            .content(stringBuffer.toString())
-                            .show();
-                }
-
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                final LocLib data = datas.get(position);
-                if (data == null) {
-                    return true;
-                }
-                new MaterialDialog.Builder(ctx)
-                        .items(new String[]{"复制", "分享", "取消"})
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                switch (which) {
-                                    case 0:
-                                        XUtil.copyText(ctx, data.getLoc_content());
-                                        XUtil.tLong("已复制~");
-                                        break;
-                                    case 1:
-                                        XUtil.sendTo(ctx, data.getLoc_content());
-                                        break;
-                                    case 2:
-                                        dialog.dismiss();
-                                        break;
-                                }
-                            }
-                        })
-                        .show();
-
-
-                return true;
-            }
-        });
+        mRecyclerView.setAdapter(mAdapter);
 
 
         searchView = (MaterialSearchView) ctx.findViewById(R.id.search_view);
@@ -217,6 +171,53 @@ public class LocLibFt extends BaseListFt {
 
 
         return view;
+    }
+
+    private void itemLongClick(int position) {
+        final LocLib data = datas.get(position);
+        if (data == null) {
+            return ;
+        }
+        new MaterialDialog.Builder(ctx)
+                .items(new String[]{"复制", "分享", "取消"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        switch (which) {
+                            case 0:
+                                XUtil.copyText(ctx, data.getLoc_content());
+                                XUtil.tLong("已复制~");
+                                break;
+                            case 1:
+                                XUtil.sendTo(ctx, data.getLoc_content());
+                                break;
+                            case 2:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                })
+                .show();
+    }
+
+    private void itemClick(int position) {
+        LocLib data = datas.get(position);
+        if (data == null) {
+            return;
+        }
+        String content = data.getLoc_content();
+        content = content.replaceAll("\\|\\|", "\n").replaceAll(":", "").replaceAll("\\[", "").replaceAll("\\]", "");
+        content = content.replaceAll("文本", " ").replaceAll("整数", " ").replaceAll("实数", " ").replaceAll("布尔", " ").replaceAll("日期/时间", " ").replaceAll("日期", " ").replaceAll("时间", " ");
+        content = content.replaceAll("图像", " ").replaceAll("评级", " ").replaceAll("单选", " ").replaceAll("多选", " ");
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(data.getLoc_name()).append("\n");
+        stringBuffer.append(content).append("\n");
+        stringBuffer.append(data.getLoc_desc()).append("\n");
+        if (XUtil.notEmptyOrNull(stringBuffer.toString())) {
+            new MaterialDialog.Builder(ctx)
+                    .content(stringBuffer.toString())
+                    .show();
+        }
     }
 
     public static void mkLib(String name, String content) {
@@ -321,7 +322,6 @@ public class LocLibFt extends BaseListFt {
                 }
             }
             mAdapter.setItems(datas);
-            listView.setCanLoadMore(canLoadMore);
             onLoadMoreComplete();
             errorView.setVisibility(View.GONE);
         } catch (Exception e) {

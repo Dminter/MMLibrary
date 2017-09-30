@@ -4,50 +4,36 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.malinskiy.materialicons.Iconify;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.umeng.analytics.MobclickAgent;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.adapter.MyViewHolder;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
-import com.zncm.library.data.Fields;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.LibAc;
 import com.zncm.library.ui.LibAddAc;
-import com.zncm.library.ui.LocLibAc;
-import com.zncm.library.ui.SettingAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.utils.Dbutils;
-import com.zncm.library.utils.DoubleClickImp;
-import com.zncm.library.utils.MySp;
-import com.zncm.library.utils.PhoneUtils;
 import com.zncm.library.utils.XUtil;
 
-import java.util.ArrayDeque;
+import de.greenrobot.event.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Random;
 
-import de.greenrobot.event.EventBus;
 import tr.xip.errorview.RetryListener;
 
 
@@ -84,7 +70,6 @@ public class LibFt extends BaseListFt {
             addButton.setVisibility(View.VISIBLE);
         }
 
-        listView.setCanLoadMore(false);
         datas = new ArrayList<Lib>();
         mAdapter = new LibAdapter(ctx) {
             @Override
@@ -126,85 +111,21 @@ public class LibFt extends BaseListFt {
                     holder.rlBg.setBackgroundResource(R.drawable.card);
                 }
             }
-        };
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                            @SuppressWarnings({"rawtypes", "unchecked"})
-                                            @Override
-                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                                int curPosition = position - listView.getHeaderViewsCount();
-                                                Lib data = datas.get(curPosition);
-                                                if (data == null) {
-                                                    return;
-                                                }
-                                                Intent intent = new Intent(ctx, ItemsAc.class);
-                                                intent.putExtra(Constant.KEY_PARAM_DATA, data);
-                                                startActivity(intent);
-                                            }
-                                        }
-
-        );
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
-                int curPosition = position - listView.getHeaderViewsCount();
-                final Lib data = datas.get(curPosition);
-                if (data == null) {
-                    return true;
-                }
-                final boolean star = data.getLib_color() == 1 ? true : false;
-                new MaterialDialog.Builder(ctx)
-                        .items(new String[]{"编辑", "删除", star ? "取消置顶" : "置顶"})
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                switch (which) {
-                                    case 0:
-                                        if (data.getLib_exi1() != Lib.libType.sys.value()) {
-                                            Intent intent = new Intent(ctx, LibAddAc.class);
-                                            intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
-                                            intent.putExtra(Constant.KEY_PARAM_DATA, data);
-                                            startActivity(intent);
-                                        } else {
-                                            XUtil.tShort("系统库不允许编辑~");
-                                        }
-                                        break;
-                                    case 1:
-                                        new MaterialDialog.Builder(ctx)
-                                                .title("删除")
-                                                .content("确认删除" + data.getLib_name())
-                                                .positiveText("删除")
-                                                .negativeText("取消")
-                                                .callback(new MaterialDialog.ButtonCallback() {
-                                                    @Override
-                                                    public void onPositive(MaterialDialog dialog) {
-                                                        super.onPositive(dialog);
-                                                        Dbutils.deleteData(data);
-                                                        datas.remove(data);
-                                                        mAdapter.setItems(datas);
-                                                    }
-                                                }).show();
-                                        break;
-                                    case 2:
-                                        if (star) {
-                                            data.setLib_color(0);
-
-                                        } else {
-                                            data.setLib_color(1);
-                                        }
-                                        Dbutils.updateLib(data);
-                                        datas.set(position, data);
-                                        mAdapter.setItems(datas);
-                                        EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
-                                        break;
-                                }
-                            }
-                        })
-                        .show();
-                return true;
+            public void OnItemLongClickListener(int position, MyViewHolder holder) {
+                itemLongClick(position);
             }
-        });
+
+
+            @Override
+            public void OnItemClickListener(int position, MyViewHolder holder) {
+                itemClick(position);
+            }
+        };
+        mRecyclerView.setAdapter(mAdapter);
+
+
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,6 +142,72 @@ public class LibFt extends BaseListFt {
         return view;
     }
 
+    private void itemClick(int position) {
+
+        Lib data = datas.get(position);
+        if (data == null) {
+            return;
+        }
+        Intent intent = new Intent(ctx, ItemsAc.class);
+        intent.putExtra(Constant.KEY_PARAM_DATA, data);
+        startActivity(intent);
+    }
+
+    private void itemLongClick(final int position) {
+        final Lib data = datas.get(position);
+        if (data == null) {
+            return;
+        }
+        final boolean star = data.getLib_color() == 1 ? true : false;
+        new MaterialDialog.Builder(ctx)
+                .items(new String[]{"编辑", "删除", star ? "取消置顶" : "置顶"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        switch (which) {
+                            case 0:
+                                if (data.getLib_exi1() != Lib.libType.sys.value()) {
+                                    Intent intent = new Intent(ctx, LibAddAc.class);
+                                    intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
+                                    intent.putExtra(Constant.KEY_PARAM_DATA, data);
+                                    startActivity(intent);
+                                } else {
+                                    XUtil.tShort("系统库不允许编辑~");
+                                }
+                                break;
+                            case 1:
+                                new MaterialDialog.Builder(ctx)
+                                        .title("删除")
+                                        .content("确认删除" + data.getLib_name())
+                                        .positiveText("删除")
+                                        .negativeText("取消")
+                                        .callback(new MaterialDialog.ButtonCallback() {
+                                            @Override
+                                            public void onPositive(MaterialDialog dialog) {
+                                                super.onPositive(dialog);
+                                                Dbutils.deleteData(data);
+                                                datas.remove(data);
+                                                mAdapter.setItems(datas,mRecyclerView);
+                                            }
+                                        }).show();
+                                break;
+                            case 2:
+                                if (star) {
+                                    data.setLib_color(0);
+
+                                } else {
+                                    data.setLib_color(1);
+                                }
+                                Dbutils.updateLib(data);
+                                datas.set(position, data);
+                                mAdapter.setItems(datas,mRecyclerView);
+                                EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
+                                break;
+                        }
+                    }
+                })
+                .show();
+    }
 
     void initProgressDlg() {
         LinearLayout view = new LinearLayout(ctx);
@@ -539,8 +526,7 @@ public class LibFt extends BaseListFt {
                     XUtil.tShort("无结果~~");
                 }
             }
-            mAdapter.setItems(datas);
-            listView.setCanLoadMore(canLoadMore);
+            mAdapter.setItems(datas,mRecyclerView);
             onLoadMoreComplete();
 
             if (!XUtil.listNotNull(datas)) {

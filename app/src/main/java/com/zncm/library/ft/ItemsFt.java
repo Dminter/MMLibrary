@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -42,6 +41,7 @@ import com.zf.zson.ZSON;
 import com.zf.zson.result.ZsonResult;
 import com.zncm.library.R;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.adapter.MyViewHolder;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.DetailInfo;
 import com.zncm.library.data.EnumData;
@@ -52,11 +52,11 @@ import com.zncm.library.data.MyApplication;
 import com.zncm.library.data.Options;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.data.SpConstant;
+import com.zncm.library.ui.InfoDetailsActivity;
 import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
 import com.zncm.library.ui.LibAddAc;
-import com.zncm.library.ui.InfoDetailsActivity;
 import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.WebViewActivity;
@@ -249,125 +249,18 @@ public class ItemsFt extends BaseListFt {
 
 
             }
-        };
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                            @SuppressWarnings({"rawtypes", "unchecked"})
-                                            @Override
-                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                                int curPosition = position - listView.getHeaderViewsCount();
-                                                Items item = datas.get(curPosition);
-                                                item.setItem_exb1(true);
-                                                datas.set(curPosition,item);
-                                                mAdapter.setItems(datas);
-
-
-
-
-                                                if (XUtil.notEmptyOrNull(query)) {
-                                                    Items data = datas.get(curPosition);
-                                                    if (data == null) {
-                                                        return;
-                                                    }
-
-                                                    Intent intent = new Intent(ctx, ItemsDetailsAc.class);
-                                                    intent.putExtra(Constant.KEY_PARAM_DATA, lib);
-                                                    intent.putExtra("item", data);
-                                                    intent.putExtra("size", -1);
-                                                    intent.putExtra(Constant.KEY_CURRENT_POSITION, curPosition);
-                                                    startActivity(intent);
-
-                                                } else {
-                                                    Items tmp = datas.get(curPosition);
-                                                    boolean flag = false;
-                                                    if (MySp.get(SpConstant.isOpenUrl, Boolean.class, false)) {
-                                                        if (lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value()
-                                                                || lib.getLib_exi1() == Lib.libType.api.value()) {
-                                                            if (XUtil.notEmptyOrNull(tmp.getItem_exs1())) {
-                                                                flag = true;
-                                                            }
-                                                        }
-                                                    }
-                                                    if (flag) {
-                                                        /**
-                                                         *已读
-                                                         */
-                                                        Dbutils.readItems(tmp.getItem_id(), true);
-                                                        if (lib.isLib_exb2()) {
-                                                            Intent intent = new Intent(ctx, InfoDetailsActivity.class);
-                                                            intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img", XUtil.getChinese(tmp.getItem_json())));
-                                                            startActivity(intent);
-                                                        } else {
-                                                            Intent intent = new Intent(ctx, WebViewActivity.class);
-                                                            intent.putExtra("url", tmp.getItem_exs1());
-                                                            startActivity(intent);
-                                                        }
-                                                    } else {
-                                                        Intent intent = new Intent(ctx, ItemsDetailsAc.class);
-                                                        intent.putExtra(Constant.KEY_PARAM_DATA, lib);
-                                                        intent.putExtra("size", datas.size());
-                                                        intent.putExtra(Constant.KEY_CURRENT_POSITION, curPosition);
-                                                        startActivity(intent);
-                                                    }
-
-
-                                                }
-
-                                            }
-                                        }
-
-        );
-
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
-
-                int curPosition = position - listView.getHeaderViewsCount();
-                final Items data = datas.get(curPosition);
-                if (data == null) {
-                    return true;
-                }
-                new MaterialDialog.Builder(ctx)
-                        .items(new String[]{"编辑", "删除", "取消"})
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                switch (which) {
-                                    case 0:
-                                        Intent intent = new Intent(ctx, ItemsAddAc.class);
-                                        intent.putExtra(Constant.KEY_PARAM_DATA, lib);
-                                        intent.putExtra(Constant.KEY_PARAM_DATA2, data);
-                                        intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
-                                        startActivity(intent);
-                                        break;
-                                    case 1:
-                                        new MaterialDialog.Builder(ctx)
-                                                .title("删除")
-                                                .content("确认删除" + data.getItem_json())
-                                                .positiveText("删除")
-                                                .negativeText("取消")
-                                                .callback(new MaterialDialog.ButtonCallback() {
-                                                    @Override
-                                                    public void onPositive(MaterialDialog dialog) {
-                                                        super.onPositive(dialog);
-                                                        Dbutils.deleteData(data);
-                                                        datas.remove(data);
-                                                        mAdapter.setItems(datas);
-                                                    }
-                                                }).show();
-                                        break;
-                                    case 2:
-                                        dialog.dismiss();
-                                        break;
-                                }
-                            }
-                        })
-                        .show();
-                return true;
+            public void OnItemLongClickListener(int position, MyViewHolder holder) {
+                itemLongClick(position);
             }
-        });
+
+            @Override
+            public void OnItemClickListener(int position, MyViewHolder holder) {
+                itemClick(position);
+            }
+        };
+        mRecyclerView.setAdapter(mAdapter);
 
 
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -438,6 +331,63 @@ public class ItemsFt extends BaseListFt {
         return view;
     }
 
+    private void itemClick(int position) {
+        Items item = datas.get(position);
+        item.setItem_exb1(true);
+        datas.set(position, item);
+        mAdapter.setItems(datas);
+
+
+        if (XUtil.notEmptyOrNull(query)) {
+            Items data = datas.get(position);
+            if (data == null) {
+                return;
+            }
+
+            Intent intent = new Intent(ctx, ItemsDetailsAc.class);
+            intent.putExtra(Constant.KEY_PARAM_DATA, lib);
+            intent.putExtra("item", data);
+            intent.putExtra("size", -1);
+            intent.putExtra(Constant.KEY_CURRENT_POSITION, position);
+            startActivity(intent);
+
+        } else {
+            Items tmp = datas.get(position);
+            boolean flag = false;
+            if (MySp.get(SpConstant.isOpenUrl, Boolean.class, false)) {
+                if (lib.getLib_exi1() == Lib.libType.rss.value() || lib.getLib_exi1() == Lib.libType.net.value()
+                        || lib.getLib_exi1() == Lib.libType.api.value()) {
+                    if (XUtil.notEmptyOrNull(tmp.getItem_exs1())) {
+                        flag = true;
+                    }
+                }
+            }
+            if (flag) {
+                /**
+                 *已读
+                 */
+                Dbutils.readItems(tmp.getItem_id(), true);
+                if (lib.isLib_exb2()) {
+                    Intent intent = new Intent(ctx, InfoDetailsActivity.class);
+                    intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img", XUtil.getChinese(tmp.getItem_json())));
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(ctx, WebViewActivity.class);
+                    intent.putExtra("url", tmp.getItem_exs1());
+                    startActivity(intent);
+                }
+            } else {
+                Intent intent = new Intent(ctx, ItemsDetailsAc.class);
+                intent.putExtra(Constant.KEY_PARAM_DATA, lib);
+                intent.putExtra("size", datas.size());
+                intent.putExtra(Constant.KEY_CURRENT_POSITION, position);
+                startActivity(intent);
+            }
+
+
+        }
+    }
+
     private void addItem() {
         Intent intent = new Intent(ctx, ItemsAddAc.class);
         intent.putExtra(Constant.KEY_PARAM_DATA, lib);
@@ -465,7 +415,8 @@ public class ItemsFt extends BaseListFt {
                 canLoadMore = false;
             }
             mAdapter.setItems(datas);
-            listView.setCanLoadMore(canLoadMore);
+            //UNDONE
+//            mRecyclerView.setCanLoadMore(canLoadMore);
             onLoadMoreComplete();
             if (!XUtil.listNotNull(datas)) {
                 errorView.setVisibility(View.VISIBLE);
@@ -978,5 +929,46 @@ public class ItemsFt extends BaseListFt {
         return stringBuffer.toString();
     }
 
-
+    private void itemLongClick(int position) {
+        final Items data = datas.get(position);
+        if (data == null) {
+            return;
+        }
+        new MaterialDialog.Builder(ctx)
+                .items(new String[]{"编辑", "删除", "取消"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        switch (which) {
+                            case 0:
+                                Intent intent = new Intent(ctx, ItemsAddAc.class);
+                                intent.putExtra(Constant.KEY_PARAM_DATA, lib);
+                                intent.putExtra(Constant.KEY_PARAM_DATA2, data);
+                                intent.putExtra(Constant.KEY_PARAM_BOOLEAN, true);
+                                startActivity(intent);
+                                break;
+                            case 1:
+                                new MaterialDialog.Builder(ctx)
+                                        .title("删除")
+                                        .content("确认删除" + data.getItem_json())
+                                        .positiveText("删除")
+                                        .negativeText("取消")
+                                        .callback(new MaterialDialog.ButtonCallback() {
+                                            @Override
+                                            public void onPositive(MaterialDialog dialog) {
+                                                super.onPositive(dialog);
+                                                Dbutils.deleteData(data);
+                                                datas.remove(data);
+                                                mAdapter.setItems(datas);
+                                            }
+                                        }).show();
+                                break;
+                            case 2:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                })
+                .show();
+    }
 }

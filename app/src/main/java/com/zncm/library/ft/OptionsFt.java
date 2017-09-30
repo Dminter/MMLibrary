@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.adapter.MyViewHolder;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.Fields;
 import com.zncm.library.data.Lib;
@@ -55,7 +56,6 @@ public class OptionsFt extends BaseListFt {
 
 
         addButton.setVisibility(View.VISIBLE);
-        listView.setCanLoadMore(false);
         datas = new ArrayList<Options>();
         mAdapter = new LibAdapter(ctx) {
             @Override
@@ -69,71 +69,18 @@ public class OptionsFt extends BaseListFt {
                 }
                 holder.tvContent.setVisibility(View.GONE);
             }
-        };
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                            @SuppressWarnings({"rawtypes", "unchecked"})
-                                            @Override
-                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                                int curPosition = position - listView.getHeaderViewsCount();
-                                                final Options data = datas.get(curPosition);
-                                                if (data == null) {
-                                                    return;
-                                                }
-                                                new MaterialDialog.Builder(ctx)
-                                                        .items(new String[]{"编辑", "删除", "取消"})
-                                                        .itemsCallback(new MaterialDialog.ListCallback() {
-                                                            @Override
-                                                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                                                switch (which) {
-                                                                    case 0:
-                                                                        bUpdate = true;
-                                                                        initEtDlg(data);
-                                                                        break;
-                                                                    case 1:
-                                                                        new MaterialDialog.Builder(ctx)
-                                                                                .title("删除")
-                                                                                .content("确认删除"+ data.getOptions_name())
-                                                                                .positiveText("删除")
-                                                                                .negativeText("取消")
-                                                                                .callback(new MaterialDialog.ButtonCallback() {
-                                                                                    @Override
-                                                                                    public void onPositive(MaterialDialog dialog) {
-                                                                                        super.onPositive(dialog);
-                                                                                        Dbutils.deleteData(data);
-                                                                                        datas.remove(data);
-                                                                                        mAdapter.setItems(datas);
-                                                                                    }
-                                                                                }).show();
-                                                                    case 2:
-                                                                        dialog.dismiss();
-                                                                        break;
-                                                                }
-                                                            }
-                                                        })
-                                                        .show();
-                                            }
-                                        }
-
-        );
-
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
-                int curPosition = position - listView.getHeaderViewsCount();
-                final Options data = datas.get(curPosition);
-                if (data == null) {
-                    return true;
-                }
+            public void OnItemLongClickListener(int position, MyViewHolder holder) {
 
-
-                return true;
             }
-        });
 
-
+            @Override
+            public void OnItemClickListener(int position, MyViewHolder holder) {
+                itemClick(position);
+            }
+        };
+        mRecyclerView.setAdapter(mAdapter);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +89,44 @@ public class OptionsFt extends BaseListFt {
         });
         return view;
     }
-
+    private void itemClick(int position) {
+        final Options data = datas.get(position);
+        if (data == null) {
+            return;
+        }
+        new MaterialDialog.Builder(ctx)
+                .items(new String[]{"编辑", "删除", "取消"})
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        switch (which) {
+                            case 0:
+                                bUpdate = true;
+                                initEtDlg(data);
+                                break;
+                            case 1:
+                                new MaterialDialog.Builder(ctx)
+                                        .title("删除")
+                                        .content("确认删除"+ data.getOptions_name())
+                                        .positiveText("删除")
+                                        .negativeText("取消")
+                                        .callback(new MaterialDialog.ButtonCallback() {
+                                            @Override
+                                            public void onPositive(MaterialDialog dialog) {
+                                                super.onPositive(dialog);
+                                                Dbutils.deleteData(data);
+                                                datas.remove(data);
+                                                mAdapter.setItems(datas);
+                                            }
+                                        }).show();
+                            case 2:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                })
+                .show();
+    }
     private void addOp() {
         bUpdate = false;
         initEtDlg(null);

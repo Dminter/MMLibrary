@@ -1,26 +1,34 @@
 package com.zncm.library.ui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Parcelable;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.webkit.DownloadListener;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.malinskiy.materialicons.Iconify;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nanotasks.BackgroundWork;
@@ -32,47 +40,31 @@ import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 import com.zncm.library.R;
 import com.zncm.library.data.Constant;
-import com.zncm.library.data.EnumData;
-import com.zncm.library.data.Fields;
-import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
-import com.zncm.library.data.RefreshEvent;
-import com.zncm.library.data.VideoInfo;
 import com.zncm.library.utils.DbHelper;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.FileMiniUtil;
 import com.zncm.library.utils.MyPath;
-import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.NotiHelper;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
-import com.zncm.library.view.ItemLongClickedPopWindow;
+import com.zncm.library.view.MyWebView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-
-import de.greenrobot.event.EventBus;
-
-import static com.zncm.library.utils.ApiUrils.myLib;
 
 
 public class WebViewActivity extends BaseAc {
 
-    private WebView mWebView;
+    private MyWebView mWebView;
     private String url;
     private Activity ctx;
     static boolean isImport = false;
@@ -104,63 +96,97 @@ public class WebViewActivity extends BaseAc {
         ctx = this;
         url = getIntent().getExtras().getString("url");
         isImport = getIntent().getExtras().getBoolean("isImport", false);
-        mWebView = (WebView) findViewById(R.id.mWebView);
-        mWebView.setWebViewClient(new WebViewClient() {
-            public boolean shouldOverrideUrlLoading(WebView view, final String url) {
-                if (!XUtil.notEmptyOrNull(url)) {
-                    return true;
-                }
+        mWebView = (MyWebView) findViewById(R.id.mWebView);
+//        mWebView.setWebViewClient(new WebViewClient() {
+//            public boolean shouldOverrideUrlLoading(WebView view, final String url) {
+//                if (!XUtil.notEmptyOrNull(url)) {
+//                    return true;
+//                }
+//
+//
+//                Tasks.executeInBackground(ctx, new BackgroundWork<Boolean>() {
+//                    @Override
+//                    public Boolean doInBackground() throws Exception {
+//                        try {
+//                            Document doc;
+//                            doc = Jsoup.connect(url).timeout(5000).get();
+//                            Elements srcLinks = doc.select("img[src$=.jpg]");
+//                            for (Element link : srcLinks) {
+//                                String imagesPath = link.attr("src");
+//                                ShareAc.initSave(Constant.SYS_PICS, url, imagesPath);
+//                            }
+//                            return true;
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        return false;
+//                    }
+//                }, new Completion<Boolean>() {
+//                    @Override
+//                    public void onSuccess(Context context, Boolean result) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Context context, Exception e) {
+//                    }
+//                });
+//
+////                mWebView.loadUrl(url);
+//
+//                WebViewActivity.this.url = url;
+//
+//                initData();
+//
+//                return true;
+//            }
+//        });
+//
+//        mWebView.setWebChromeClient(new WebChromeClient() {
+//            public void onProgressChanged(WebView view, int progress) {
+//                getSupportActionBar().setTitle(view.getTitle());
+//
+//            }
+//        });
 
-
-                Tasks.executeInBackground(ctx, new BackgroundWork<Boolean>() {
-                    @Override
-                    public Boolean doInBackground() throws Exception {
-                        try {
-                            Document doc;
-                            doc = Jsoup.connect(url).timeout(5000).get();
-                            Elements srcLinks = doc.select("img[src$=.jpg]");
-                            for (Element link : srcLinks) {
-                                String imagesPath = link.attr("src");
-                                ShareAc.initSave(Constant.SYS_PICS, url, imagesPath);
-                            }
-                            return true;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return false;
-                    }
-                }, new Completion<Boolean>() {
-                    @Override
-                    public void onSuccess(Context context, Boolean result) {
-
-                    }
-
-                    @Override
-                    public void onError(Context context, Exception e) {
-                    }
-                });
-
-//                mWebView.loadUrl(url);
-
-                WebViewActivity.this.url = url;
-
-                initData();
-
-                return true;
-            }
-        });
 
         mWebView.setWebChromeClient(new WebChromeClient() {
-            public void onProgressChanged(WebView view, int progress) {
-                getSupportActionBar().setTitle(view.getTitle());
-
+            //android>5.0调用这个方法
+            @Override
+            public boolean onShowFileChooser(WebView webView,
+                                             ValueCallback<Uri[]> filePathCallback,
+                                             FileChooserParams fileChooserParams) {
+                mUploadCallbackAboveL=filePathCallback;
+                take();
+                return true;
+            }
+            public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+                mUploadMessage=uploadMsg;
+                take();
+            }
+            public void openFileChooser(ValueCallback<Uri> uploadMsg,String acceptType) {
+                mUploadMessage=uploadMsg;
+                take();
+            }
+            public void openFileChooser(ValueCallback<Uri> uploadMsg,String acceptType, String capture) {
+                mUploadMessage=uploadMsg;
+                take();
             }
         });
+
+
+
+
+
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.getSettings().setDomStorageEnabled(true);
+
+        mWebView.getSettings().setAllowFileAccess(true);
+
+
         mWebView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(final String url, String userAgent, String contentDisposition,
@@ -185,7 +211,6 @@ public class WebViewActivity extends BaseAc {
         });
 
 
-
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public void onLongPress(MotionEvent e) {
@@ -197,8 +222,8 @@ public class WebViewActivity extends BaseAc {
             @Override
             public boolean onLongClick(View v) {
                 WebView.HitTestResult result = ((WebView) v).getHitTestResult();
-                if (WebView.HitTestResult.IMAGE_TYPE==result.getType()){
-                    if (XUtil.notEmptyOrNull(result.getExtra())){
+                if (WebView.HitTestResult.IMAGE_TYPE == result.getType()) {
+                    if (XUtil.notEmptyOrNull(result.getExtra())) {
                         Intent intent = new Intent(ctx, PhotoAc.class);
                         intent.putExtra("url", result.getExtra());
                         startActivity(intent);
@@ -207,6 +232,17 @@ public class WebViewActivity extends BaseAc {
                 return true;
             }
         });
+
+
+
+        mWebView.setOnGetSelectTextListener(new MyWebView.OnGetSelectTextListener() {
+            @Override
+            public void getSelectText(String text) {
+                Toast.makeText(ctx,text,Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
 //        mWebView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -284,7 +320,6 @@ public class WebViewActivity extends BaseAc {
 //        });
 
 
-
         searchView = (MaterialSearchView) ctx.findViewById(R.id.search_view);
         searchView.setHint("搜索");
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
@@ -337,6 +372,9 @@ public class WebViewActivity extends BaseAc {
             super.onPostExecute(aVoid);
 
         }
+
+
+
     }
 
 
@@ -395,6 +433,9 @@ public class WebViewActivity extends BaseAc {
                     }
                 });
         downloadManager.add(downloadRequest);
+
+
+
     }
 
 
@@ -579,5 +620,113 @@ public class WebViewActivity extends BaseAc {
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
+
+
+
+    private ValueCallback<Uri> mUploadMessage;// 表单的数据信息
+    private ValueCallback<Uri[]> mUploadCallbackAboveL;
+    private final static int FILECHOOSER_RESULTCODE = 1;// 表单的结果回调
+    private Uri imageUri;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==FILECHOOSER_RESULTCODE)
+        {
+            if (null == mUploadMessage && null == mUploadCallbackAboveL) return;
+            Uri result = data == null || resultCode != RESULT_OK ? null : data.getData();
+            if (mUploadCallbackAboveL != null) {
+                onActivityResultAboveL(requestCode, resultCode, data);
+            }
+            else  if (mUploadMessage != null) {
+                Log.e("result",result+"");
+                if(result==null){
+//                   mUploadMessage.onReceiveValue(imageUri);
+                    mUploadMessage.onReceiveValue(imageUri);
+                    mUploadMessage = null;
+
+                    Log.e("imageUri",imageUri+"");
+                }else {
+                    mUploadMessage.onReceiveValue(result);
+                    mUploadMessage = null;
+                }
+
+
+            }
+        }
+    }
+
+    @SuppressWarnings("null")
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void onActivityResultAboveL(int requestCode, int resultCode, Intent data) {
+        if (requestCode != FILECHOOSER_RESULTCODE
+                || mUploadCallbackAboveL == null) {
+            return;
+        }
+
+        Uri[] results = null;
+        if (resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                results = new Uri[]{imageUri};
+            } else {
+                String dataString = data.getDataString();
+                ClipData clipData = data.getClipData();
+
+                if (clipData != null) {
+                    results = new Uri[clipData.getItemCount()];
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        ClipData.Item item = clipData.getItemAt(i);
+                        results[i] = item.getUri();
+                    }
+                }
+
+                if (dataString != null)
+                    results = new Uri[]{Uri.parse(dataString)};
+            }
+        }
+        if(results!=null){
+            mUploadCallbackAboveL.onReceiveValue(results);
+            mUploadCallbackAboveL = null;
+        }else{
+            results = new Uri[]{imageUri};
+            mUploadCallbackAboveL.onReceiveValue(results);
+            mUploadCallbackAboveL = null;
+        }
+
+        return;
+    }
+
+    private void take(){
+        File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyApp");
+        // Create the storage directory if it does not exist
+        if (! imageStorageDir.exists()){
+            imageStorageDir.mkdirs();
+        }
+        File file = new File(imageStorageDir + File.separator + "IMG_" + String.valueOf(System.currentTimeMillis()) + ".jpg");
+        imageUri = Uri.fromFile(file);
+
+        final List<Intent> cameraIntents = new ArrayList<Intent>();
+        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        final PackageManager packageManager = getPackageManager();
+        final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+        for(ResolveInfo res : listCam) {
+            final String packageName = res.activityInfo.packageName;
+            final Intent i = new Intent(captureIntent);
+            i.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            i.setPackage(packageName);
+            i.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            cameraIntents.add(i);
+
+        }
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("image/*");
+        Intent chooserIntent = Intent.createChooser(i,"Image Chooser");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[]{}));
+        startActivityForResult(chooserIntent,  FILECHOOSER_RESULTCODE);
+    }
+
+
+
 
 }

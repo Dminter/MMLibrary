@@ -8,12 +8,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.zncm.library.adapter.LibAdapter;
+import com.zncm.library.adapter.MyViewHolder;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Fields;
@@ -24,11 +24,12 @@ import com.zncm.library.ui.LibAddAc;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.XUtil;
 
+import de.greenrobot.event.EventBus;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 import tr.xip.errorview.RetryListener;
 
 
@@ -70,26 +71,25 @@ public class FieldsFt extends BaseListFt {
                         opDlg(data);
                     }
                 });
+
+            }
+
+            @Override
+            public void OnItemLongClickListener(int position, MyViewHolder holder) {
+                final Fields data = datas.get(position);
+                opDlg(data);
+            }
+
+            @Override
+            public void OnItemClickListener(int position, MyViewHolder holder) {
+//                final Fields data = datas.get(position);
+//                if (data == null) {
+//                    return;
+//                }
+//                opDlg(data);
             }
         };
-        listView.setAdapter(mAdapter);
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
-                int curPosition = position - listView.getHeaderViewsCount();
-                final Fields data = datas.get(curPosition);
-                if (data == null) {
-                    return true;
-                }
-                opDlg(data);
-
-
-                return true;
-            }
-
-
-        });
+        mRecyclerView.setAdapter(mAdapter);
 
 
         addButton.setOnClickListener(new View.OnClickListener() {

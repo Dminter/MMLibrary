@@ -3,6 +3,8 @@ package com.zncm.library.ft;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +22,7 @@ import tr.xip.errorview.ErrorView;
 
 public abstract class BaseListFt extends BaseFt implements SwipeRefreshLayout.OnRefreshListener, LoadMoreListView.OnLoadMoreListener {
     protected SwipeRefreshLayout swipeLayout;
-    protected LoadMoreListView listView;
+    protected RecyclerView mRecyclerView;
     protected boolean onLoading = false;
     protected View view;
     protected FloatingActionButton addButton;
@@ -40,9 +42,13 @@ public abstract class BaseListFt extends BaseFt implements SwipeRefreshLayout.On
         );
         swipeLayout.setBackgroundColor(getResources().getColor(R.color.white));
         // MySp.getTheme()
-        listView = (LoadMoreListView) view.findViewById(R.id.listView);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.mRecyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(layoutManager);
+
         errorView = (ErrorView) view.findViewById(R.id.errorView);
-        listView.setOnLoadMoreListener(this);
 
         addButton = (FloatingActionButton) view.findViewById(R.id.button_floating_action);
 
@@ -50,13 +56,13 @@ public abstract class BaseListFt extends BaseFt implements SwipeRefreshLayout.On
 //        addButton.setColorPressed(MySp.getTheme() + 10);
 
 
-        addButton.attachToListView(listView);
 
 
         addButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                listView.setSelection(0);
+                //UNDONE
+//                mRecyclerView.setSelection(0);
                 return true;
             }
         });
@@ -69,12 +75,13 @@ public abstract class BaseListFt extends BaseFt implements SwipeRefreshLayout.On
     public void onLoadMoreComplete() {
         swipeLayout.setRefreshing(false);
         onLoading = false;
-        listView.onLoadMoreComplete();
+//        listView.onLoadMoreComplete();
 
     }
 
     public void listToTop() {
-        listView.setSelection(0);
+        //UNDONE
+//        listView.setSelection(0);
     }
 
 
