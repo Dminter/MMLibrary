@@ -34,7 +34,6 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zf.zson.ZSON;
@@ -48,7 +47,6 @@ import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Fields;
 import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
-import com.zncm.library.data.MyApplication;
 import com.zncm.library.data.Options;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.data.SpConstant;
@@ -57,7 +55,6 @@ import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
 import com.zncm.library.ui.LibAddAc;
-import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.WebViewActivity;
 import com.zncm.library.utils.ApiUrils;
@@ -372,9 +369,10 @@ public class ItemsFt extends BaseListFt {
                     intent.putExtra(Constant.KEY_PARAM_DATA, new DetailInfo(tmp.getItem_exs1(), "img", XUtil.getChinese(tmp.getItem_json())));
                     startActivity(intent);
                 } else {
-                    Intent intent = new Intent(ctx, WebViewActivity.class);
-                    intent.putExtra("url", tmp.getItem_exs1());
-                    startActivity(intent);
+
+                    String url = tmp.getItem_exs1();
+                    openUrl(ctx,url);
+
                 }
             } else {
                 Intent intent = new Intent(ctx, ItemsDetailsAc.class);
@@ -387,6 +385,17 @@ public class ItemsFt extends BaseListFt {
 
         }
     }
+
+    public static void openUrl(Context ctx, String url) {
+        if (MySp.getOuterOpenUrl()) {
+            XUtil.openUrl(ctx, url);
+        } else {
+            Intent intent = new Intent(ctx, WebViewActivity.class);
+            intent.putExtra("url", url);
+            ctx.startActivity(intent);
+        }
+    }
+
 
     private void addItem() {
         Intent intent = new Intent(ctx, ItemsAddAc.class);

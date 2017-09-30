@@ -483,9 +483,8 @@ public class ItemsDetailsFt extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Items curItem = itemsList.get(mViewPager.getCurrentItem());
-                        Intent intent = new Intent(ctx, WebViewActivity.class);
-                        intent.putExtra("url", curItem.getItem_exs1());
-                        startActivity(intent);
+                        String url = curItem.getItem_exs1();
+                        ItemsFt.openUrl(ctx,url);
                     }
                 });
 

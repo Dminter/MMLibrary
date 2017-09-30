@@ -84,7 +84,6 @@ public class WebViewActivity extends BaseAc {
         getSupportActionBar().setTitle("");
         initView();
         initData();
-
     }
 
     @Override
@@ -443,6 +442,7 @@ public class WebViewActivity extends BaseAc {
         if (!XUtil.notEmptyOrNull(url)) {
             return;
         }
+
         if (urlSet.add(url)) {
             urls.add(url);
         }

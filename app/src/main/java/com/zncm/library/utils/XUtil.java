@@ -468,6 +468,21 @@ public class XUtil {
         }
     }
 
+    /**
+     *打开链接
+     */
+    public static void openUrl(Context ctx, String url) {
+        Intent intent = new Intent();
+        try {
+            intent.setAction("android.intent.action.VIEW");
+            Uri content_url = Uri.parse(url);
+            intent.setData(content_url);
+            ctx.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static boolean isPic(String url) {
         if (notEmptyOrNull(url)) {
             if (url.startsWith("http") || url.contains("www")) {

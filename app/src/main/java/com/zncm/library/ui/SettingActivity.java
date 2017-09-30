@@ -283,6 +283,17 @@ public class SettingActivity extends MaterialSettings {
         }).setDefaultValue(MySp.getClipboardListen()));
 
 
+
+        addItem(new DividerItem(ctx));
+
+        addItem(new CheckboxItem(this, "").setTitle("外部浏览器打开链接").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
+                MySp.setOuterOpenUrl(isChecked);
+            }
+        }).setDefaultValue(MySp.getOuterOpenUrl()));
+
+
         addItem(new DividerItem(ctx));
         addItem(new CheckboxItem(this, "").setTitle("监听通知栏").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
             @Override

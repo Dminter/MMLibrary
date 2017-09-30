@@ -23,6 +23,7 @@ public class MySp extends MySharedPreferences {
         sys_tip,
         show_finish,
         clipboard_listen,
+        outer_open_url,
         today_date,
         list_animation,
         vp_animation,
@@ -249,6 +250,13 @@ public class MySp extends MySharedPreferences {
 
     public static Boolean getClipboardListen() {
         return getBoolean(getSharedPreferences(), Key.clipboard_listen.toString(), true);
+    }
+    public static void setOuterOpenUrl(Boolean outer_open_url) {
+        putBoolean(getSharedPreferences(), Key.outer_open_url.toString(), outer_open_url);
+    }
+
+    public static Boolean getOuterOpenUrl() {
+        return getBoolean(getSharedPreferences(), Key.outer_open_url.toString(), true);
     }
 
     public static void setSysTip(Boolean sys_tip) {
