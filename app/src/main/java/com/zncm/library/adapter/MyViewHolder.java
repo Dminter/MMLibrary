@@ -14,9 +14,7 @@ import com.zncm.library.R;
 public class MyViewHolder extends RecyclerView.ViewHolder {
     public TextView tvTitle;
     public TextView tvContent;
-    public ImageView tvIcon;
     public ImageView ivIcon;
-    public IconTextView operate;
     public CardView mCardView;
     public Button btn;
 
@@ -26,8 +24,6 @@ public class MyViewHolder extends RecyclerView.ViewHolder {
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             ivIcon = (ImageView) itemView.findViewById(R.id.ivIcon);
             tvContent = (TextView) itemView.findViewById(R.id.tvContent);
-            tvIcon = (ImageView) itemView.findViewById(R.id.tvIcon);
-            operate = (IconTextView) itemView.findViewById(R.id.operate);
             btn = (Button) itemView.findViewById(R.id.btn);
             mCardView = (CardView) itemView.findViewById(R.id.mCardView);
         }

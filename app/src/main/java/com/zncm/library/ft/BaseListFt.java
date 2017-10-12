@@ -61,6 +61,8 @@ public abstract class BaseListFt extends BaseFt implements OnRefreshListener {
                 return true;
             }
         });
+        addButton.setColorNormal(getResources().getColor(R.color.colorPrimary));
+        addButton.setColorPressed(getResources().getColor(R.color.colorPrimaryDark));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 

@@ -6,11 +6,6 @@
     <color name="action_bar">#2DBD60</color>
     <color name="action_button">#2DBD60</color>
 
-
-    <color name="primary">@color/material_brown_800</color>
-    <color name="primary_dark">@color/material_brown_800</color>
-
-
     <color name="accent">#ff4081</color>
 
     <color name="positive_color">#303f9f</color>
@@ -75,9 +70,9 @@
     <color name="black">#383838</color>
 
 
-    <color name="colorPrimary">@color/material_brown_800</color>
-    <color name="colorPrimaryDark">@color/material_brown_900</color>
-    <color name="colorAccent">@color/material_brown_900</color>
+    <color name="colorPrimary">@color/material_orange_800</color>
+    <color name="colorPrimaryDark">@color/material_orange_900</color>
+    <color name="colorAccent">@color/material_orange_900</color>
 
 
     <color name="material_red_50">#FFEBEE</color>

@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <gradient android:startColor="@color/btn_blue" android:endColor="@color/btn_blue" android:angle="90" />
+            <gradient android:startColor="@color/colorPrimary" android:endColor="@color/colorPrimary" android:angle="90" />
             <corners android:radius="2dp" />
         </shape>
     </item>
@@ -10,7 +10,7 @@
 
     <item android:state_pressed="true">
         <shape>
-            <gradient android:startColor="@color/btn_blue_sel" android:endColor="@color/btn_blue_sel" android:angle="270" />
+            <gradient android:startColor="@color/colorPrimaryDark" android:endColor="@color/colorPrimaryDark" android:angle="270" />
             <corners android:radius="2dp" />
         </shape>
     </item>

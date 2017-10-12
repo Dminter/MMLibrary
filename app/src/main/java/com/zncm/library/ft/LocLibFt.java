@@ -75,13 +75,13 @@ public class LocLibFt extends BaseListFt {
                 if (XUtil.notEmptyOrNull(data.getLoc_name())) {
                     holder.tvTitle.setVisibility(View.VISIBLE);
                     holder.tvTitle.setText(data.getLoc_name());
-                    holder.ivIcon.setVisibility(View.VISIBLE);
-                    TextDrawable drawable = TextDrawable.builder()
-                            .buildRect(data.getLoc_name().substring(0, 1), mColorGenerator.getColor(data.getLoc_name()));
-                    holder.ivIcon.setImageDrawable(drawable);
+//                    holder.ivIcon.setVisibility(View.VISIBLE);
+//                    TextDrawable drawable = TextDrawable.builder()
+//                            .buildRect(data.getLoc_name().substring(0, 1), mColorGenerator.getColor(data.getLoc_name()));
+//                    holder.ivIcon.setImageDrawable(drawable);
                 } else {
                     holder.tvTitle.setVisibility(View.GONE);
-                    holder.ivIcon.setVisibility(View.GONE);
+//                    holder.ivIcon.setVisibility(View.GONE);
                 }
                 if (XUtil.notEmptyOrNull(data.getLoc_name())) {
                     holder.tvTitle.setVisibility(View.VISIBLE);

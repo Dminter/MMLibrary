@@ -34,6 +34,7 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zf.zson.ZSON;
@@ -47,6 +48,7 @@ import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Fields;
 import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
+import com.zncm.library.data.MyApplication;
 import com.zncm.library.data.Options;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.data.SpConstant;
@@ -55,6 +57,7 @@ import com.zncm.library.ui.ItemsAc;
 import com.zncm.library.ui.ItemsAddAc;
 import com.zncm.library.ui.ItemsDetailsAc;
 import com.zncm.library.ui.LibAddAc;
+import com.zncm.library.ui.PhotoAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.WebViewActivity;
 import com.zncm.library.utils.ApiUrils;
@@ -139,16 +142,12 @@ public class ItemsFt extends BaseListFt {
                 String picUrl = null;
 
 
+
                 if (data.isItem_exb1()) {
-                    holder.tvIcon.setVisibility(View.GONE);
+                    holder.tvTitle.setTextColor(getResources().getColor(R.color.colorPrimary));
                 } else {
-                    holder.tvIcon.setVisibility(View.VISIBLE);
+                    holder.tvTitle.setTextColor(getResources().getColor(R.color.material_light_black));
                 }
-//                if (data.isItem_exb1()) {
-//                    holder.rlBg.setBackgroundResource(R.drawable.card_dark);
-//                } else {
-//                    holder.rlBg.setBackgroundResource(R.drawable.card);
-//                }
 
                 if (XUtil.notEmptyOrNull(data.getItem_json())) {
                     Map<String, Object> map = new HashMap<>();
@@ -194,31 +193,26 @@ public class ItemsFt extends BaseListFt {
                     holder.tvContent.setVisibility(View.GONE);
                 }
                 if (XUtil.notEmptyOrNull(picUrl)) {
-//                    holder.ivIcon.setVisibility(View.VISIBLE);
-//                    MyApplication.imageLoader.displayImage(picUrl,
-//                            holder.ivIcon, new SimpleImageLoadingListener() {
-//                                @Override
-//                                public void onLoadingStarted(String imageUri, View view) {
-//                                    holder.ivIcon.setImageResource(R.drawable.ic_lib);
-//                                    super.onLoadingStarted(imageUri, view);
-//                                }
-//                            });
-//                    final String finalPicUrl = picUrl;
-//                    holder.ivIcon.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Intent intent = new Intent(ctx, PhotoAc.class);
-//                            intent.putExtra("url", finalPicUrl);
-//                            startActivity(intent);
-//                        }
-//                    });
-                } else if (XUtil.notEmptyOrNull(title)) {
-//                    holder.ivIcon.setVisibility(View.VISIBLE);
-//                    TextDrawable drawable = TextDrawable.builder()
-//                            .buildRect(title.substring(0, 1), mColorGenerator.getColor(title.substring(0, 1)));
-//                    holder.ivIcon.setImageDrawable(drawable);
+                    holder.ivIcon.setVisibility(View.VISIBLE);
+                    MyApplication.imageLoader.displayImage(picUrl,
+                            holder.ivIcon, new SimpleImageLoadingListener() {
+                                @Override
+                                public void onLoadingStarted(String imageUri, View view) {
+                                    holder.ivIcon.setImageResource(R.drawable.ic_lib);
+                                    super.onLoadingStarted(imageUri, view);
+                                }
+                            });
+                    final String finalPicUrl = picUrl;
+                    holder.ivIcon.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(ctx, PhotoAc.class);
+                            intent.putExtra("url", finalPicUrl);
+                            startActivity(intent);
+                        }
+                    });
                 } else {
-//                    holder.ivIcon.setVisibility(View.GONE);
+                    holder.ivIcon.setVisibility(View.GONE);
                 }
 
 

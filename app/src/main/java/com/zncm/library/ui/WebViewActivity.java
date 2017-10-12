@@ -40,8 +40,10 @@ import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 import com.zncm.library.R;
 import com.zncm.library.data.Constant;
+import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
+import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.utils.DbHelper;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.FileMiniUtil;
@@ -50,6 +52,8 @@ import com.zncm.library.utils.NotiHelper;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.htmlbot.contentextractor.ContentExtractor;
 import com.zncm.library.view.MyWebView;
+
+import de.greenrobot.event.EventBus;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -63,7 +67,7 @@ import java.util.Set;
 
 
 public class WebViewActivity extends BaseAc {
-
+    public static String charset = "UTF-8";
     private MyWebView mWebView;
     private String url;
     private Activity ctx;
@@ -407,7 +411,7 @@ public class WebViewActivity extends BaseAc {
                                 if (url.equals(Constant.LOCLIB_NET)) {
                                     DbHelper.importLocCsv(ctx, new File(newFile));
                                 } else {
-                                    SettingAc.getData(ctx, newFile);
+                                  getData(ctx, newFile);
                                 }
                             } else {
                                 XUtil.tShort("格式不支持");
@@ -728,5 +732,40 @@ public class WebViewActivity extends BaseAc {
 
 
 
+    public static void getData(Context ctx, String path) {
+//        dlg = new MaterialDialog.Builder(ctx)
+//                .title("请稍后...")
+//                .autoDismiss(false)
+//                .show();
+        GetData getData = new GetData();
+        getData.execute(path);
+    }
+
+    static class GetData extends AsyncTask<String, Integer, Boolean> {
+
+        protected Boolean doInBackground(String... params) {
+            DbHelper.importCsv(new File(params[0]), charset);
+            return true;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            XUtil.tShort("values: " + values[0]);
+        }
+
+        protected void onPostExecute(Boolean canLoadMore) {
+            super.onPostExecute(canLoadMore);
+            XUtil.tShort("数据已成功导入 ~");
+            EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
+//            dlg.dismiss();
+        }
+    }
 
 }

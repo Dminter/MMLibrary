@@ -64,13 +64,6 @@ public class FieldsFt extends BaseListFt {
                 } else {
                     holder.tvContent.setVisibility(View.GONE);
                 }
-                holder.operate.setVisibility(View.VISIBLE);
-                holder.operate.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        opDlg(data);
-                    }
-                });
 
             }
 

@@ -25,6 +25,7 @@ import com.kenumir.materialsettings.items.TextItem;
 import com.kenumir.materialsettings.storage.StorageInterface;
 import com.malinskiy.materialicons.Iconify;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.zncm.library.BuildConfig;
 import com.zncm.library.R;
 import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
@@ -221,10 +222,9 @@ public class SettingActivity extends MaterialSettings {
                 XUtil.sendTo(ctx, "我在玩“我的库”,实用的东西非常多，很不错，推荐一下。下载地址: " + Constant.SHARE_URL);
             }
         }));
+        String buildTime = BuildConfig.BUILD_TIME;
 
-        String buildDate = "2017-4-9 18:31:42";
-
-        addItem(new TextItem(ctx, "").setTitle("检查更新").setSubtitle("当前版本:" + XUtil.getVersionName(ctx) + " (Build " + XUtil.getVersionCode(ctx) + ") @" + buildDate).setOnclick(new TextItem.OnClickListener() {
+        addItem(new TextItem(ctx, "").setTitle("检查更新").setSubtitle("当前版本:" + XUtil.getVersionName(ctx) + " (Build " + XUtil.getVersionCode(ctx) + ") @" + buildTime).setOnclick(new TextItem.OnClickListener() {
             @Override
             public void onClick(TextItem textItem) {
                 Intent intent = new Intent(ctx, WebViewActivity.class);
@@ -238,8 +238,8 @@ public class SettingActivity extends MaterialSettings {
             public void onClick(TextItem textItem) {
                 StringBuffer stringBuffer = new StringBuffer();
                 stringBuffer.append("开发者微信: xm0ff255").append("\n");
-                stringBuffer.append("qq群: ").append(Constant.QQ_GROUP).append("\n");
-                stringBuffer.append("库投稿: liuxingmin126@163.com").append("\n");
+//                stringBuffer.append("qq群: ").append(Constant.QQ_GROUP).append("\n");
+//                stringBuffer.append("库投稿: liuxingmin126@163.com").append("\n");
                 stringBuffer.append("旨在灵活多变的管理任何类型的信息").append("\n");
                 new MaterialDialog.Builder(ctx)
                         .title("关于 " + getResources().getString(R.string.app_name) + " " + XUtil.getVersionName(ctx))
