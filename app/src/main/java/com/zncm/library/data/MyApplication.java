@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Build;
 
+import com.idescout.sql.SqlScoutServer;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.MemoryCache;
@@ -66,7 +67,7 @@ public class MyApplication extends Application {
                 }
             }
         });
-
+        SqlScoutServer.create(this, getPackageName());
     }
 
     public static MyApplication getInstance() {

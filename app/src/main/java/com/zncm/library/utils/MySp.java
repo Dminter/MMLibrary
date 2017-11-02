@@ -1,6 +1,7 @@
 package com.zncm.library.utils;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 
 import com.alibaba.fastjson.JSON;
 import com.zncm.library.data.BaseData;
@@ -199,7 +200,7 @@ public class MySp extends MySharedPreferences {
     }
 
     public static Integer getTheme() {
-        return getInt(getSharedPreferences(), Key.theme.toString(), Integer.parseInt("#4E342E"));
+        return getInt(getSharedPreferences(), Key.theme.toString(), Color.parseColor("#4E342E"));
     }
 
     public static void setTemplateVersion(Integer template_version) {

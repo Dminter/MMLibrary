@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    android:id="@+id/mCardView"
-                                    android:orientation="vertical"
-                                    android:layout_width="match_parent"
-                                    android:foreground="@drawable/card_foreground"
-                                    card_view:cardCornerRadius="@dimen/card_corner_radius"
-                                    card_view:cardElevation="@dimen/card_elevation"
-                                    android:layout_margin="5dp"
-                                    android:minHeight="45dp"
-                                    android:layout_height="wrap_content"
+<android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/mCardView"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        card_view:cardCornerRadius="@dimen/card_corner_radius"
+        card_view:cardElevation="@dimen/card_elevation"
+        android:layout_margin="5dp"
+        android:minHeight="55dp"
+        android:foreground="@drawable/card_foreground_selector"
+        android:layout_height="wrap_content"
 >
 
 
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
+                    android:layout_margin="10dp"
                     android:orientation="vertical">
 
 
@@ -43,22 +42,15 @@
                 android:visibility="gone"/>
 
 
-        <LinearLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/ivIcon"
                 android:layout_toLeftOf="@+id/btn"
+                android:minHeight="55dp"
                 android:layout_centerVertical="true"
                 android:visibility="visible"
                 android:orientation="vertical">
-
-
-            <TextView
-                    android:id="@+id/tvTitle"
-                    style="@style/mText"
-                    android:text="AAAA"
-                 />
-
             <TextView
                     android:id="@+id/tvContent"
                     style="@style/mText"
@@ -68,7 +60,17 @@
                     android:textColor="@color/gray"
                     android:textSize="14sp"/>
 
-        </LinearLayout>
+
+            <TextView
+                    android:id="@+id/tvTitle"
+                    style="@style/mText"
+                    android:text="AAAA"
+                    android:layout_below="@+id/tvContent"
+                    android:layout_centerInParent="true"
+            />
+
+
+        </RelativeLayout>
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

@@ -37,7 +37,7 @@ public class TabMyLibActivity extends BaseAc {
     private LibFt libNetFt;
     private LibFt libApiFt;
     private ViewPager mViewPager;
-    private String TITLES[] = new String[]{"我的库", "系统库", "RSS", "网络库", "API"};
+    private String TITLES[] = new String[]{ "RSS", "网络库", "API","系统库", "我的库",};
     MaterialSearchView searchView;
 
     Context ctx;
@@ -119,25 +119,25 @@ public class TabMyLibActivity extends BaseAc {
             Fragment fragment = null;
             Bundle bundle = null;
             switch (position) {
-                case 0:
+                case 4:
                     libFt = new LibFt();
                     fragment = libFt;
                     break;
-                case 1:
+                case 3:
                     libSysFt = new LibFt();
                     bundle = new Bundle();
                     bundle.putInt("libType", Lib.libType.sys.value());
                     libSysFt.setArguments(bundle);
                     fragment = libSysFt;
                     break;
-                case 2:
+                case 0:
                     libRssFt = new LibFt();
                     bundle = new Bundle();
                     bundle.putInt("libType", Lib.libType.rss.value());
                     libRssFt.setArguments(bundle);
                     fragment = libRssFt;
                     break;
-                case 3:
+                case 1:
                     libNetFt = new LibFt();
                     bundle = new Bundle();
                     bundle.putInt("libType", Lib.libType.net.value());
@@ -145,7 +145,7 @@ public class TabMyLibActivity extends BaseAc {
                     fragment = libNetFt;
                     break;
 
-                case 4:
+                case 2:
                     libApiFt = new LibFt();
                     bundle = new Bundle();
                     bundle.putInt("libType", Lib.libType.api.value());

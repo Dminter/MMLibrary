@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.zncm.library"
@@ -73,4 +73,5 @@ dependencies {
     compile files('libs/umeng-onlineconfig_v1.0.0.jar')
     compile files('libs/fastjson-1.2.7.jar')
     compile files('libs/zson.jar')
+    compile 'com.idescout.sql:sqlscout-server:2.0'
 }

@@ -86,9 +86,6 @@
         <activity android:name=".ui.PhotoAc"/>
         <activity android:name=".ui.ApiAc"/>
         <activity
-                android:name=".ui.SettingAc"
-                android:theme="@style/SettingTheme"/>
-        <activity
                 android:name="com.etiennelawlor.imagegallery.library.activities.ImageGalleryActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:label=""

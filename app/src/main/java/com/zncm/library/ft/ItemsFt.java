@@ -149,6 +149,14 @@ public class ItemsFt extends BaseListFt {
                     holder.tvTitle.setTextColor(getResources().getColor(R.color.material_light_black));
                 }
 
+
+                if (MySp.get(SpConstant.isListSimple, Boolean.class, true)) {
+                    holder.tvTitle.setMaxLines(3);
+                }else {
+                    holder.tvTitle.setMaxLines(10);
+                }
+
+
                 if (XUtil.notEmptyOrNull(data.getItem_json())) {
                     Map<String, Object> map = new HashMap<>();
                     try {
@@ -224,19 +232,20 @@ public class ItemsFt extends BaseListFt {
                 }
 
 
-                if (XUtil.notEmptyOrNull(content)) {
-                    content = XUtil.subStr(content, 30);
-                    holder.tvContent.setVisibility(View.VISIBLE);
-                    if (lib.getLib_exi1() == Lib.libType.rss.value()) {
-                        content = XUtil.replaceImageURLs(content);
-                        holder.tvContent.setText(XUtil.stripHtml(content.trim()));
-                    } else {
-                        holder.tvContent.setText(XUtil.stripHtml(content.trim()));
-//                        holder.tvContent.setText(content.trim());
-                    }
-                } else {
-                    holder.tvContent.setVisibility(View.GONE);
-                }
+//                if (XUtil.notEmptyOrNull(content)) {
+//                    content = XUtil.subStr(content, 30);
+//                    holder.tvContent.setVisibility(View.VISIBLE);
+//                    if (lib.getLib_exi1() == Lib.libType.rss.value()) {
+//                        content = XUtil.replaceImageURLs(content);
+//                        holder.tvContent.setText(XUtil.stripHtml(content.trim()));
+//                    } else {
+//                        holder.tvContent.setText(XUtil.stripHtml(content.trim()));
+////                        holder.tvContent.setText(content.trim());
+//                    }
+//                } else {
+//                    holder.tvContent.setVisibility(View.GONE);
+//                }
+                holder.tvContent.setVisibility(View.GONE);
 
 
             }

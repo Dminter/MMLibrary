@@ -108,7 +108,9 @@ public class ShareAc extends BaseAc {
     }
 
     public static void saveDataList(int libId, ArrayList<String> list) {
-        saveDataList(libId, list, null);
+        Items items = new Items();
+        items.setItem_exb1(true);
+        saveDataList(libId, list, items);
     }
 
     public static void saveDataList(int libId, ArrayList<String> list, Items items) {

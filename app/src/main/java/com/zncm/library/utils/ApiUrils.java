@@ -22,9 +22,10 @@ import com.zncm.library.data.Fields;
 import com.zncm.library.data.Items;
 import com.zncm.library.data.Lib;
 import com.zncm.library.data.MyApplication;
-import com.zncm.library.data.ObjEvent;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.ui.ShareAc;
+
+import de.greenrobot.event.EventBus;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,9 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
-
-import de.greenrobot.event.EventBus;
 
 
 public class ApiUrils {
@@ -501,9 +499,9 @@ public class ApiUrils {
                                     /**
                                      * 小于10个字符且li的舍弃
                                      */
-                                    if (element.text().length()<20&&XUtil.notEmptyOrNull(elementsKey)&&elementsKey.equals("li")){
+                                    if (element.text().length() < 20 && XUtil.notEmptyOrNull(elementsKey) && elementsKey.equals("li")) {
 
-                                    }else {
+                                    } else {
                                         list.add(element.text());
                                         dlist.add(_durl);
                                     }
@@ -557,7 +555,9 @@ public class ApiUrils {
                         if (topItem != 0) {
                             Map<String, Object> map = new HashMap<>();
                             map.put(String.valueOf(topItem), XUtil.getDateFullSec());
-                            Dbutils.addItems(new Items(myLib.getLib_id(), new JSONObject(map).toJSONString()));
+                            Items items = new Items(myLib.getLib_id(), new JSONObject(map).toJSONString());
+                            items.setItem_exb1(true);
+                            Dbutils.addItems(items);
                         }
                         EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.ITEMS.getValue()));
                     } else {

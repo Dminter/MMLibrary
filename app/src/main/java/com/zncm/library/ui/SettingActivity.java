@@ -257,15 +257,17 @@ public class SettingActivity extends MaterialSettings {
             }
         }));
 
-        addItem(new TextItem(ctx, "").setTitle("帮助").setSubtitle("新手指导").setOnclick(new TextItem.OnClickListener() {
+
+        addItem(new HeaderItem(this).setTitle("TIPS!"));
+
+        addItem(new TextItem(ctx, "").setTitle("API库").setSubtitle("@URL，标识这个字段是链接，可以点击直接跳转到网页").setOnclick(new TextItem.OnClickListener() {
             @Override
             public void onClick(TextItem textItem) {
-                Intent intent = new Intent(ctx, WebViewActivity.class);
-                intent.putExtra("url", "file:///android_asset/help/main.html");
-                startActivity(intent);
+
             }
         }));
-        addItem(new HeaderItem(this).setTitle("TIPS!"));
+
+
         addItem(new TextItem(ctx, "").setTitle("搜索").setSubtitle("库里面搜索 @200 直接跳转到200页").setOnclick(new TextItem.OnClickListener() {
             @Override
             public void onClick(TextItem textItem) {
@@ -328,12 +330,20 @@ public class SettingActivity extends MaterialSettings {
             }
         }));
 
+        addItem(new CheckboxItem(this, "").setTitle("简洁列表").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
+                MySp.put(SpConstant.isListSimple, isChecked);
+            }
+        }).setDefaultValue(MySp.get(SpConstant.isListSimple, Boolean.class, true)));
+
         addItem(new CheckboxItem(this, "").setTitle("详情显示创建/修改时间").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
             @Override
             public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
                 MySp.put(SpConstant.isShowTime, isChecked);
             }
         }).setDefaultValue(MySp.get(SpConstant.isShowTime, Boolean.class, true)));
+
         addItem(new CheckboxItem(this, "").setTitle("详情显示标题").setOnCheckedChangeListener(new CheckboxItem.OnCheckedChangeListener() {
             @Override
             public void onCheckedChange(CheckboxItem cbi, boolean isChecked) {
