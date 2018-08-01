@@ -186,7 +186,6 @@ public class WebViewActivity extends BaseAc {
         mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.getSettings().setDomStorageEnabled(true);
-
         mWebView.getSettings().setAllowFileAccess(true);
 
 
