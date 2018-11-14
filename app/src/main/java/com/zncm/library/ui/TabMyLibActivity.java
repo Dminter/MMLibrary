@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.astuetz.PagerSlidingTabStrip;
 import com.malinskiy.materialicons.Iconify;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.zncm.library.R;
 import com.zncm.library.data.Constant;
@@ -176,16 +177,18 @@ public class TabMyLibActivity extends BaseAc {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("qrcode").setIcon(getResources().getDrawable(R.drawable.qrcode)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
         getMenuInflater().inflate(R.menu.lib_search, menu);
         MenuItem item = menu.findItem(R.id.action_search);
         searchView.setMenuItem(item);
 
         SubMenu sub = menu.addSubMenu("");
         sub.setIcon(XUtil.initIconWhite(Iconify.IconValue.md_more_vert));
+
         sub.add(0, 1, 0, "设置");
         sub.add(0, 2, 0, "模板");
         sub.add(0, 3, 0, "浏览器");
-        sub.add(0, 4, 0, "扫一扫");
         sub.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
@@ -211,7 +214,10 @@ public class TabMyLibActivity extends BaseAc {
 //        if (item.getTitle().equals("md_search")) {
 //            searchView.showSearch(true);
 //        }
-
+        if (item.getTitle().equals("qrcode")) {
+            Intent intent = new Intent(this, QRActivity.class);
+            startActivityForResult(intent, 1111);
+        }
         if (item == null || item.getTitle() == null) {
             return false;
         }
@@ -227,16 +233,7 @@ public class TabMyLibActivity extends BaseAc {
                 intent.putExtra("url", "https://m.baidu.com/");
                 startActivity(intent);
                 break;
-            case 4:
-                intent = new Intent(this, QRActivity.class);
-                startActivityForResult(intent, 1111);
-                break;
 
-            case 5:
-
-                break;
-            case 6:
-                break;
         }
 
         return false;

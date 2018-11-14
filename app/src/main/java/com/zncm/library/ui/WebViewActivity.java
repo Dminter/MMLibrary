@@ -16,17 +16,10 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
-import android.webkit.DownloadListener;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.malinskiy.materialicons.Iconify;
@@ -34,6 +27,11 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
+import com.tencent.smtt.sdk.DownloadListener;
+import com.tencent.smtt.sdk.ValueCallback;
+
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 import com.thin.downloadmanager.DefaultRetryPolicy;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
@@ -57,6 +55,8 @@ import de.greenrobot.event.EventBus;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ import java.util.Set;
 
 public class WebViewActivity extends BaseAc {
     public static String charset = "UTF-8";
-    private MyWebView mWebView;
+    private WebView mWebView;
     private String url;
     private Activity ctx;
     static boolean isImport = false;
@@ -76,11 +76,6 @@ public class WebViewActivity extends BaseAc {
 
     Set<String> urlSet = new HashSet<>();
     ArrayList<String> urls = new ArrayList<>();
-    private GestureDetector gestureDetector;
-    private int downX, downY;
-
-
-    String imgurl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,14 +94,14 @@ public class WebViewActivity extends BaseAc {
         ctx = this;
         url = getIntent().getExtras().getString("url");
         isImport = getIntent().getExtras().getBoolean("isImport", false);
-        mWebView = (MyWebView) findViewById(R.id.mWebView);
-//        mWebView.setWebViewClient(new WebViewClient() {
-//            public boolean shouldOverrideUrlLoading(WebView view, final String url) {
-//                if (!XUtil.notEmptyOrNull(url)) {
-//                    return true;
-//                }
-//
-//
+        mWebView = (WebView) findViewById(R.id.mWebView);
+        mWebView.setWebViewClient(new WebViewClient() {
+            public boolean shouldOverrideUrlLoading(WebView view, final String url) {
+                if (!XUtil.notEmptyOrNull(url)) {
+                    return true;
+                }
+
+
 //                Tasks.executeInBackground(ctx, new BackgroundWork<Boolean>() {
 //                    @Override
 //                    public Boolean doInBackground() throws Exception {
@@ -134,51 +129,16 @@ public class WebViewActivity extends BaseAc {
 //                    public void onError(Context context, Exception e) {
 //                    }
 //                });
-//
-////                mWebView.loadUrl(url);
-//
-//                WebViewActivity.this.url = url;
-//
-//                initData();
-//
-//                return true;
-//            }
-//        });
-//
-//        mWebView.setWebChromeClient(new WebChromeClient() {
-//            public void onProgressChanged(WebView view, int progress) {
-//                getSupportActionBar().setTitle(view.getTitle());
-//
-//            }
-//        });
 
+//                mWebView.loadUrl(url);
 
-        mWebView.setWebChromeClient(new WebChromeClient() {
-            //android>5.0调用这个方法
-            @Override
-            public boolean onShowFileChooser(WebView webView,
-                                             ValueCallback<Uri[]> filePathCallback,
-                                             FileChooserParams fileChooserParams) {
-                mUploadCallbackAboveL=filePathCallback;
-                take();
+                WebViewActivity.this.url = url;
+
+                initData();
+
                 return true;
             }
-            public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-                mUploadMessage=uploadMsg;
-                take();
-            }
-            public void openFileChooser(ValueCallback<Uri> uploadMsg,String acceptType) {
-                mUploadMessage=uploadMsg;
-                take();
-            }
-            public void openFileChooser(ValueCallback<Uri> uploadMsg,String acceptType, String capture) {
-                mUploadMessage=uploadMsg;
-                take();
-            }
         });
-
-
-
 
 
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -211,117 +171,6 @@ public class WebViewActivity extends BaseAc {
 
             }
         });
-
-
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public void onLongPress(MotionEvent e) {
-                downX = (int) e.getX();
-                downY = (int) e.getY();
-            }
-        });
-        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                WebView.HitTestResult result = ((WebView) v).getHitTestResult();
-                if (WebView.HitTestResult.IMAGE_TYPE == result.getType()) {
-                    if (XUtil.notEmptyOrNull(result.getExtra())) {
-                        Intent intent = new Intent(ctx, PhotoAc.class);
-                        intent.putExtra("url", result.getExtra());
-                        startActivity(intent);
-                    }
-                }
-                return true;
-            }
-        });
-
-
-
-        mWebView.setOnGetSelectTextListener(new MyWebView.OnGetSelectTextListener() {
-            @Override
-            public void getSelectText(String text) {
-                Toast.makeText(ctx,text,Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-//        mWebView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                WebView.HitTestResult result = ((WebView) v).getHitTestResult();
-//                if (WebView.HitTestResult.IMAGE_TYPE==result.getType()){
-//                    if (XUtil.notEmptyOrNull(result.getExtra())){
-//                        Intent intent = new Intent(ctx, PhotoAc.class);
-//                        intent.putExtra("url", result.getExtra());
-//                        startActivity(intent);
-//                    }
-//                }
-//
-//            }
-//        });
-//        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//
-//                XUtil.debug("长按了webview");
-//
-//
-//                WebView.HitTestResult result = ((WebView) v).getHitTestResult();
-//
-//
-//                /**
-//                 *WebView.HitTestResult.UNKNOWN_TYPE    未知类型
-//                 WebView.HitTestResult.PHONE_TYPE    电话类型
-//                 WebView.HitTestResult.EMAIL_TYPE    电子邮件类型
-//                 WebView.HitTestResult.GEO_TYPE    地图类型
-//                 WebView.HitTestResult.SRC_ANCHOR_TYPE    超链接类型
-//                 WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE    带有链接的图片类型
-//                 WebView.HitTestResult.IMAGE_TYPE    单纯的图片类型
-//                 WebView.HitTestResult.EDIT_TEXT_TYPE    选中的文字类型
-//                 */
-//
-//
-//                if (null == result)
-//                    return false;
-//                int type = result.getType();
-//                if (type == WebView.HitTestResult.UNKNOWN_TYPE)
-//                    return false;
-//                if (type == WebView.HitTestResult.EDIT_TEXT_TYPE) {
-//                    //let TextViewhandles context menu return true;
-//                }
-//                final ItemLongClickedPopWindow itemLongClickedPopWindow = new ItemLongClickedPopWindow(WebViewActivity.this, ItemLongClickedPopWindow.IMAGE_VIEW_POPUPWINDOW, XUtil.dip2px(120), XUtil.dip2px(90));
-//                // Setup custom handlingdepending on the type
-//                switch (type) {
-//                    case WebView.HitTestResult.PHONE_TYPE: // 处理拨号
-//                        break;
-//                    case WebView.HitTestResult.EMAIL_TYPE: // 处理Email
-//                        break;
-//                    case WebView.HitTestResult.GEO_TYPE: // TODO
-//                        break;
-//                    case WebView.HitTestResult.SRC_ANCHOR_TYPE: // 超链接
-//                        // Log.d(DEG_TAG, "超链接");
-//                        break;
-//                    case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
-//                        break;
-//                    case WebView.HitTestResult.IMAGE_TYPE: // 处理长按图片的菜单项
-//                        imgurl = result.getExtra();
-//                        //通过GestureDetector获取按下的位置，来定位PopWindow显示的位置
-////                        itemLongClickedPopWindow.showAtLocation(v, Gravity.TOP | Gravity.LEFT, (int) v.getX()+ 10, (int) v.getY() + 10);
-//
-//                        if (XUtil.notEmptyOrNull(imgurl)){
-//                            Intent intent = new Intent(ctx, PhotoAc.class);
-//                            intent.putExtra("url", imgurl);
-//                            startActivity(intent);
-//                        }
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-
-
         searchView = (MaterialSearchView) ctx.findViewById(R.id.search_view);
         searchView.setHint("搜索");
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
@@ -626,116 +475,9 @@ public class WebViewActivity extends BaseAc {
 
 
 
-    private ValueCallback<Uri> mUploadMessage;// 表单的数据信息
-    private ValueCallback<Uri[]> mUploadCallbackAboveL;
-    private final static int FILECHOOSER_RESULTCODE = 1;// 表单的结果回调
-    private Uri imageUri;
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==FILECHOOSER_RESULTCODE)
-        {
-            if (null == mUploadMessage && null == mUploadCallbackAboveL) return;
-            Uri result = data == null || resultCode != RESULT_OK ? null : data.getData();
-            if (mUploadCallbackAboveL != null) {
-                onActivityResultAboveL(requestCode, resultCode, data);
-            }
-            else  if (mUploadMessage != null) {
-                Log.e("result",result+"");
-                if(result==null){
-//                   mUploadMessage.onReceiveValue(imageUri);
-                    mUploadMessage.onReceiveValue(imageUri);
-                    mUploadMessage = null;
-
-                    Log.e("imageUri",imageUri+"");
-                }else {
-                    mUploadMessage.onReceiveValue(result);
-                    mUploadMessage = null;
-                }
-
-
-            }
-        }
-    }
-
-    @SuppressWarnings("null")
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void onActivityResultAboveL(int requestCode, int resultCode, Intent data) {
-        if (requestCode != FILECHOOSER_RESULTCODE
-                || mUploadCallbackAboveL == null) {
-            return;
-        }
-
-        Uri[] results = null;
-        if (resultCode == Activity.RESULT_OK) {
-            if (data == null) {
-                results = new Uri[]{imageUri};
-            } else {
-                String dataString = data.getDataString();
-                ClipData clipData = data.getClipData();
-
-                if (clipData != null) {
-                    results = new Uri[clipData.getItemCount()];
-                    for (int i = 0; i < clipData.getItemCount(); i++) {
-                        ClipData.Item item = clipData.getItemAt(i);
-                        results[i] = item.getUri();
-                    }
-                }
-
-                if (dataString != null)
-                    results = new Uri[]{Uri.parse(dataString)};
-            }
-        }
-        if(results!=null){
-            mUploadCallbackAboveL.onReceiveValue(results);
-            mUploadCallbackAboveL = null;
-        }else{
-            results = new Uri[]{imageUri};
-            mUploadCallbackAboveL.onReceiveValue(results);
-            mUploadCallbackAboveL = null;
-        }
-
-        return;
-    }
-
-    private void take(){
-        File imageStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyApp");
-        // Create the storage directory if it does not exist
-        if (! imageStorageDir.exists()){
-            imageStorageDir.mkdirs();
-        }
-        File file = new File(imageStorageDir + File.separator + "IMG_" + String.valueOf(System.currentTimeMillis()) + ".jpg");
-        imageUri = Uri.fromFile(file);
-
-        final List<Intent> cameraIntents = new ArrayList<Intent>();
-        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        final PackageManager packageManager = getPackageManager();
-        final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
-        for(ResolveInfo res : listCam) {
-            final String packageName = res.activityInfo.packageName;
-            final Intent i = new Intent(captureIntent);
-            i.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-            i.setPackage(packageName);
-            i.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-            cameraIntents.add(i);
-
-        }
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.addCategory(Intent.CATEGORY_OPENABLE);
-        i.setType("image/*");
-        Intent chooserIntent = Intent.createChooser(i,"Image Chooser");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[]{}));
-        startActivityForResult(chooserIntent,  FILECHOOSER_RESULTCODE);
-    }
-
 
 
     public static void getData(Context ctx, String path) {
-//        dlg = new MaterialDialog.Builder(ctx)
-//                .title("请稍后...")
-//                .autoDismiss(false)
-//                .show();
         GetData getData = new GetData();
         getData.execute(path);
     }

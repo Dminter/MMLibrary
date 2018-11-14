@@ -49,7 +49,7 @@ public abstract class BaseListFt extends BaseFt implements OnRefreshListener {
         });
         mRecyclerView = (RecyclerView) view.findViewById(R.id.mRecyclerView);
         mRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
         errorView = (ErrorView) view.findViewById(R.id.errorView);
         addButton = (FloatingActionButton) view.findViewById(R.id.button_floating_action);

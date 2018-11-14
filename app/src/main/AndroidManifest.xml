@@ -80,7 +80,8 @@
 
         <activity android:name=".ui.TabSettingAc"/>
         <activity android:name=".ui.OptionsAc"/>
-        <activity android:name=".ui.WebViewActivity"/>
+        <activity android:name=".ui.WebViewActivity"
+                  android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity android:name=".ui.TabLibActivity"/>
         <activity android:name=".ui.LocLibAc"/>
         <activity android:name=".ui.PhotoAc"/>

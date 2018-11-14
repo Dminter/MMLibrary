@@ -327,7 +327,6 @@ public class LibFt extends BaseListFt implements OnRefreshListener {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         try {
-
                             String content = editText.getText().toString().trim();
                             if (!XUtil.notEmptyOrNull(content)) {
                                 XUtil.tShort("输入内容~");
@@ -344,19 +343,14 @@ public class LibFt extends BaseListFt implements OnRefreshListener {
                     @Override
                     public void onNeutral(MaterialDialog dialog) {
                         try {
-
                             String content = editText.getText().toString().trim();
                             if (!XUtil.notEmptyOrNull(content)) {
                                 XUtil.tShort("输入内容~");
                                 XUtil.dismissShowDialog(dialog, false);
                                 return;
                             }
-
                             ApiFt.getFeedsByQuery(ctx, content);
-
-
                             XUtil.dismissShowDialog(dialog, false);
-
                         } catch (Exception e) {
                         }
 

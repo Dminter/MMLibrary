@@ -63,6 +63,7 @@ public class MyApplication extends Application {
                     if (XUtil.isEmptyOrNull(myLastClipboard) || !myLastClipboard.equals(content)) {
                         myLastClipboard = content;
                         ShareAc.initSave(Constant.SYS_CLIPBOARD, content, "");
+                        XUtil.tShort("MMLibrary：已复制~");
                     }
                 }
             }
@@ -135,10 +136,6 @@ public class MyApplication extends Application {
         imageLoader = ImageLoader.getInstance();
         imageLoader.init(config);
     }
-
-
-
-
 
 
 }

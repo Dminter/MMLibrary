@@ -67,6 +67,7 @@ import com.zncm.library.utils.ImageUtil;
 import com.zncm.library.utils.MyPath;
 import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.MyStringRequest;
+import com.zncm.library.utils.RssUtils;
 import com.zncm.library.utils.XUtil;
 import com.zncm.library.utils.saxrssreader.RssFeed;
 import com.zncm.library.utils.saxrssreader.RssItem;
@@ -74,6 +75,7 @@ import com.zncm.library.utils.saxrssreader.RssReader;
 
 import de.greenrobot.event.EventBus;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -471,8 +473,11 @@ public class ItemsFt extends BaseListFt {
 
         try {
             URL url = new URL(lib.getLib_exs1());
-            RssFeed feed = RssReader.read(url);
-            ArrayList<RssItem> rssItems = feed.getRssItems();
+//            RssFeed feed = RssReader.read(url);
+//            ArrayList<RssItem> rssItems = feed.getRssItems();
+//            URL url = new URL(urlLink);
+            InputStream inputStream = url.openConnection().getInputStream();
+            ArrayList<RssItem> rssItems = RssUtils.parseFeed(inputStream);
             ArrayList<String> list;
             if (XUtil.listNotNull(rssItems)) {
                 Collections.reverse(rssItems);

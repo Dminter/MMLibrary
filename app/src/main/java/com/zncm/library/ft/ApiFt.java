@@ -24,21 +24,20 @@ import com.zncm.library.data.ApiData.Feed;
 import com.zncm.library.data.ApiData.Joke;
 import com.zncm.library.data.ApiData.News;
 import com.zncm.library.data.ApiData.NewsUrls;
-import com.zncm.library.data.Constant;
 import com.zncm.library.data.ApiData.WxHot;
+import com.zncm.library.data.Constant;
 import com.zncm.library.data.EnumData;
 import com.zncm.library.data.Lib;
-import com.zncm.library.data.LocLib;
 import com.zncm.library.data.RefreshEvent;
 import com.zncm.library.ui.ItemsAc;
-import com.zncm.library.ui.LibAddAc;
 import com.zncm.library.ui.ShareAc;
 import com.zncm.library.ui.WebViewActivity;
-import com.zncm.library.utils.DbHelper;
 import com.zncm.library.utils.Dbutils;
 import com.zncm.library.utils.MySp;
 import com.zncm.library.utils.MyStringRequest;
 import com.zncm.library.utils.XUtil;
+
+import de.greenrobot.event.EventBus;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -46,10 +45,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
-
-import de.greenrobot.event.EventBus;
 
 
 public class ApiFt extends BaseFt {
@@ -563,7 +559,6 @@ public class ApiFt extends BaseFt {
                         String item = obj.getString("results");
 //                        item = new org.json.JSONObject(item).getString("contentlist");
                         final ArrayList<Feed> list = (ArrayList<Feed>) JSON.parseArray(item, Feed.class);
-
                         final ArrayList<String> items = new ArrayList<>();
                         for (Feed tmp : list
                                 ) {
@@ -582,6 +577,8 @@ public class ApiFt extends BaseFt {
                                             ShareAc.initLibRss(items.get(which), content);
                                             EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
                                             XUtil.tShort("已添加" + items.get(which));
+                                            EventBus.getDefault().post(new RefreshEvent(EnumData.RefreshEnum.LIB.getValue()));
+                                            dialog.dismiss();
                                         }
                                     }
                                 })

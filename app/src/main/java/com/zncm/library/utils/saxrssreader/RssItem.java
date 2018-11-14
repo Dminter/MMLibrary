@@ -38,6 +38,12 @@ public class RssItem implements Comparable<RssItem>, Parcelable {
 
 	}
 
+	public RssItem(String title, String link, String description) {
+		this.title = title;
+		this.link = link;
+		this.description = description;
+	}
+
 	public RssItem(Parcel source) {
 
 		Bundle data = source.readBundle();

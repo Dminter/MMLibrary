@@ -8,7 +8,7 @@
     <dimen name="navigation_drawer_width">240dp</dimen>
 
 
-    <dimen name="card_corner_radius">6dp</dimen>
-    <dimen name="card_elevation">8dp</dimen>
+    <dimen name="card_corner_radius">2dp</dimen>
+    <dimen name="card_elevation">1dp</dimen>
 
 </resources>
